@@ -15,9 +15,17 @@ Parameters:
   SiteBucketName:
     Type: String
     Description: Globally unique S3 bucket name for the site artifacts.
+  EnableWaf:
+    Type: String
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Default: 'false'
+    Description: Set to true to enable WAF IP allowlisting on CloudFront.
   AllowedIPv4Cidr:
     Type: String
-    Description: Initial IPv4 CIDR allowed to reach the site through WAF.
+    Default: '127.0.0.1/32'
+    Description: IPv4 CIDR allowed to reach the site through WAF (only used when EnableWaf is true).
   CreateRoute53Records:
     Type: String
     AllowedValues:
@@ -43,6 +51,7 @@ Parameters:
     Description: Tag value used for project cost attribution and budgets.
 
 Conditions:
+  UseWaf: !Equals [!Ref EnableWaf, 'true']
   UseCustomDomain: !Equals [!Ref EnableCustomDomain, 'true']
   UseRoute53: !Equals [!Ref CreateRoute53Records, 'true']
   HasHostedZone: !Not [!Equals [!Ref Route53HostedZoneId, '']]
@@ -84,6 +93,7 @@ Resources:
 
   AllowedIpSet:
     Type: AWS::WAFv2::IPSet
+    Condition: UseWaf
     Properties:
       Name: !Join
         - '-'
@@ -102,6 +112,7 @@ Resources:
 
   WebAcl:
     Type: AWS::WAFv2::WebACL
+    Condition: UseWaf
     Properties:
       Name: !Join
         - '-'
@@ -195,7 +206,37 @@ Resources:
             MinimumProtocolVersion: TLSv1.2_2021
             SslSupportMethod: sni-only
           - CloudFrontDefaultCertificate: true
-        WebACLId: !GetAtt WebAcl.Arn
+        Logging:
+          Bucket: !GetAtt LoggingBucket.DomainName
+          IncludeCookies: false
+          Prefix: cloudfront/
+        WebACLId: !If
+          - UseWaf
+          - !GetAtt WebAcl.Arn
+          - !Ref AWS::NoValue
+
+  LoggingBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${SiteBucketName}-logs'
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+        - Key: App
+          Value: static-site
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerPreferred
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireAccessLogs
+            Status: Enabled
+            ExpirationInDays: 90
 
   SiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -248,11 +289,16 @@ Outputs:
       - UseCustomDomain
       - !Sub 'https://${SiteDomainName}'
       - !Sub 'https://${Distribution.DomainName}'
+  LoggingBucketName:
+    Value: !Ref LoggingBucket
   WebAclArn:
+    Condition: UseWaf
     Value: !GetAtt WebAcl.Arn
   WafIpSetId:
+    Condition: UseWaf
     Value: !GetAtt AllowedIpSet.Id
   WafIpSetName:
+    Condition: UseWaf
     Value: !Join
       - '-'
       - - !Ref AWS::StackName

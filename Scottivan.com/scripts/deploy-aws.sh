@@ -13,6 +13,7 @@ SITE_DOMAIN_NAME="${SITE_DOMAIN_NAME:-scottivan.com}"
 ENABLE_CUSTOM_DOMAIN="${ENABLE_CUSTOM_DOMAIN:-false}"
 CREATE_ROUTE53_RECORDS="${CREATE_ROUTE53_RECORDS:-false}"
 ROUTE53_HOSTED_ZONE_ID="${ROUTE53_HOSTED_ZONE_ID:-}"
+ENABLE_WAF="${ENABLE_WAF:-false}"
 PRICE_CLASS="${PRICE_CLASS:-PriceClass_100}"
 PROJECT_TAG_VALUE="${PROJECT_TAG_VALUE:-scottivan-site}"
 
@@ -30,7 +31,7 @@ normalize_cidr() {
   fi
 }
 
-if [[ -z "${ALLOWED_IPV4_CIDR:-}" ]]; then
+if [[ "$ENABLE_WAF" == "true" && -z "${ALLOWED_IPV4_CIDR:-}" ]]; then
   ALLOWED_IPV4_CIDR="$(normalize_cidr "$(detect_public_ip)")"
 fi
 
@@ -59,7 +60,10 @@ echo "Deploying stack '$STACK_NAME' in $AWS_REGION"
 echo "  domain: $SITE_DOMAIN_NAME"
 echo "  custom domain enabled: $ENABLE_CUSTOM_DOMAIN"
 echo "  bucket: $SITE_BUCKET_NAME"
-echo "  allowlist: $ALLOWED_IPV4_CIDR"
+echo "  waf enabled: $ENABLE_WAF"
+if [[ "$ENABLE_WAF" == "true" ]]; then
+  echo "  allowlist: $ALLOWED_IPV4_CIDR"
+fi
 echo "  route53 records: $CREATE_ROUTE53_RECORDS"
 echo "  project tag: $PROJECT_TAG_VALUE"
 
@@ -70,8 +74,9 @@ aws cloudformation deploy \
   --parameter-overrides \
     SiteDomainName="$SITE_DOMAIN_NAME" \
     EnableCustomDomain="$ENABLE_CUSTOM_DOMAIN" \
+    EnableWaf="$ENABLE_WAF" \
     SiteBucketName="$SITE_BUCKET_NAME" \
-    AllowedIPv4Cidr="$ALLOWED_IPV4_CIDR" \
+    AllowedIPv4Cidr="${ALLOWED_IPV4_CIDR:-127.0.0.1/32}" \
     CreateRoute53Records="$CREATE_ROUTE53_RECORDS" \
     Route53HostedZoneId="$ROUTE53_HOSTED_ZONE_ID" \
     PriceClass="$PRICE_CLASS" \

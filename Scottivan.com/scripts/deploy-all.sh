@@ -7,7 +7,10 @@ SETUP_BUDGET="${SETUP_BUDGET:-true}"
 
 "$SCRIPT_DIR/deploy-aws.sh"
 "$SCRIPT_DIR/publish-site.sh"
-"$SCRIPT_DIR/update-allowlist-ip.sh"
+
+if [[ "${ENABLE_WAF:-false}" == "true" ]]; then
+  "$SCRIPT_DIR/update-allowlist-ip.sh"
+fi
 
 if [[ "$SETUP_BUDGET" == "true" ]]; then
   "$SCRIPT_DIR/setup-budget.sh"
