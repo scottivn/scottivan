@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Scott Ivan | Platform Engineer — scottivan.com preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0e1a; --surface: #111827; --border: #1f2937;
+    --green: #00ff88; --cyan: #00d4ff; --yellow: #ffd700; --red: #ff4757;
+    --muted: #4b5563; --dim: #94a3b8; --text: #e2e8f0;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
+    pointer-events: none; z-index: 9999;
+  }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--green); border-radius: 3px; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .glow-green { text-shadow: 0 0 10px rgba(0,255,136,.8), 0 0 20px rgba(0,255,136,.4); }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    padding: .85rem 2rem; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(10,14,26,.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0,255,136,.1);
+  }
+  .nav-logo { font-family: 'JetBrains Mono', monospace; font-size: .85rem; text-decoration: none; }
+  .nav-logo .g { color: var(--green); } .nav-logo .d { color: var(--dim); } .nav-logo .c { color: var(--cyan); }
+  .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+  .nav-links a { font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--dim); text-decoration: none; transition: color .2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--green); }
+  .cursor-blink { display: inline-block; width: 8px; height: 14px; background: var(--green); margin-left: 2px; vertical-align: middle; animation: blink 1s step-end infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh; display: grid; place-items: center; padding: 6rem 2rem 4rem;
+    background: radial-gradient(ellipse at 20% 50%, rgba(0,255,136,.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 20%, rgba(0,212,255,.05) 0%, transparent 55%), var(--bg);
+  }
+  .hero-grid { max-width: 1100px; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  @media(max-width:800px) { .hero-grid { grid-template-columns: 1fr; } }
+
+  /* Terminal window */
+  .terminal-win { border: 1px solid rgba(0,255,136,.2); border-radius: 10px; overflow: hidden; background: rgba(17,24,39,.9); backdrop-filter: blur(10px); box-shadow: 0 0 40px rgba(0,255,136,.05); }
+  .terminal-bar { display: flex; align-items: center; gap: .5rem; padding: .75rem 1rem; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-r { background: var(--red); } .dot-y { background: var(--yellow); } .dot-g { background: var(--green); }
+  .terminal-title { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--muted); margin-left: .75rem; }
+  .terminal-body { padding: 1.5rem; font-family: 'JetBrains Mono', monospace; font-size: .78rem; line-height: 1.7; min-height: 300px; }
+  .line-cmd { color: var(--green); } .line-out { color: var(--text); } .line-pod { color: var(--dim); }
+
+  /* Hero right */
+  .hero-right { display: flex; flex-direction: column; gap: 2rem; }
+  .hero-name { font-size: 3.5rem; font-weight: 700; line-height: 1.1; color: white; }
+  .hero-name span { background: linear-gradient(90deg, var(--green), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero-desc { color: var(--dim); font-size: 1rem; line-height: 1.7; font-weight: 300; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  .stat-card { border: 1px solid rgba(0,255,136,.15); background: rgba(17,24,39,.8); border-radius: 8px; padding: .75rem; text-align: center; transition: border-color .3s, box-shadow .3s; }
+  .stat-card:hover { border-color: rgba(0,255,136,.4); box-shadow: 0 0 15px rgba(0,255,136,.08); }
+  .stat-val { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; font-weight: 700; color: var(--green); }
+  .stat-sub { font-family: 'JetBrains Mono', monospace; font-size: .65rem; color: var(--dim); margin-top: .25rem; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .btn-primary { font-family: 'JetBrains Mono', monospace; font-size: .8rem; padding: .75rem 1.5rem; background: var(--green); color: var(--bg); border-radius: 6px; text-decoration: none; font-weight: 700; transition: box-shadow .3s, opacity .2s; }
+  .btn-primary:hover { box-shadow: 0 0 20px rgba(0,255,136,.5); opacity: .9; }
+  .btn-outline { font-family: 'JetBrains Mono', monospace; font-size: .8rem; padding: .75rem 1.5rem; border: 1px solid rgba(0,255,136,.3); color: var(--green); border-radius: 6px; text-decoration: none; transition: border-color .3s, background .2s; }
+  .btn-outline:hover { border-color: var(--green); background: rgba(0,255,136,.05); }
+
+  /* Sections */
+  section { padding: 4rem 2rem; }
+  .section-inner { max-width: 1100px; margin: 0 auto; }
+  .section-cmd { font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--muted); margin-bottom: .5rem; }
+  .section-title { font-size: 1.75rem; font-weight: 700; color: white; margin-bottom: 2rem; }
+
+  /* Skills bars */
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  @media(max-width:600px) { .skills-grid { grid-template-columns: 1fr; } }
+  .skill-meta { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: .8rem; margin-bottom: .5rem; }
+  .skill-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .skill-fill { height: 100%; border-radius: 3px; transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+
+  /* Chess stats */
+  .chess-box { border: 1px solid rgba(0,255,136,.15); background: rgba(17,24,39,.8); border-radius: 10px; padding: 1.25rem; }
+  .chess-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: .75rem; margin-top: 1rem; }
+  @media(max-width:600px) { .chess-grid { grid-template-columns: repeat(2,1fr); } }
+  .chess-card { border-radius: 8px; padding: .75rem; text-align: center; }
+
+  /* Interests grid */
+  .interests-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+  @media(max-width:700px) { .interests-grid { grid-template-columns: repeat(2,1fr); } }
+  .interest-card { border: 1px solid rgba(0,255,136,.15); background: rgba(17,24,39,.8); border-radius: 10px; padding: 1.25rem; transition: transform .2s, border-color .3s, box-shadow .3s; cursor: default; }
+  .interest-card:hover { transform: translateY(-3px); border-color: rgba(0,255,136,.35); box-shadow: 0 8px 30px rgba(0,0,0,.3); }
+  .interest-icon { font-size: 1.75rem; margin-bottom: .75rem; }
+  .interest-name { font-size: .9rem; font-weight: 600; color: var(--text); }
+  .interest-desc { font-family: 'JetBrains Mono', monospace; font-size: .68rem; color: var(--dim); margin-top: .35rem; }
+
+  /* Resume cards */
+  .resume-box { border: 1px solid rgba(0,255,136,.15); background: rgba(17,24,39,.8); border-radius: 10px; padding: 1.25rem; }
+  .timeline { display: flex; flex-direction: column; gap: 2rem; }
+  .timeline-item { display: flex; gap: 1.25rem; }
+  .timeline-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid; flex-shrink: 0; margin-top: 3px; }
+  .job-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: .5rem; margin-bottom: .75rem; }
+  .job-role { font-weight: 600; color: var(--text); font-size: .95rem; }
+  .job-team { font-family: 'JetBrains Mono', monospace; font-size: .7rem; margin-top: .25rem; }
+  .job-period { font-family: 'JetBrains Mono', monospace; font-size: .7rem; color: var(--muted); white-space: nowrap; }
+  .job-bullets { list-style: none; margin-bottom: 1rem; display: flex; flex-direction: column; gap: .4rem; }
+  .job-bullets li { display: flex; gap: .5rem; font-size: .85rem; color: var(--dim); }
+  .job-bullets li::before { content: '›'; flex-shrink: 0; margin-top: 1px; }
+  .tags { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .tag { font-family: 'JetBrains Mono', monospace; font-size: .65rem; padding: .2rem .5rem; border-radius: 4px; border: 1px solid; }
+  .skills-matrix { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .skill-cat h4 { font-family: 'JetBrains Mono', monospace; font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; margin-bottom: .6rem; }
+
+  /* Projects */
+  .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:600px) { .projects-grid { grid-template-columns: 1fr; } .skills-matrix { grid-template-columns: 1fr; } }
+  .project-card { border: 1px solid rgba(0,255,136,.15); background: rgba(17,24,39,.8); border-radius: 10px; padding: 1.25rem; display: flex; flex-direction: column; gap: .75rem; }
+
+  /* kubectl easter egg */
+  .kubectl-hint { max-width: 1100px; margin: 0 auto; padding: 0 2rem 1rem; }
+  .kubectl-hint button { font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--muted); background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: .5rem; transition: color .2s; }
+  .kubectl-hint button:hover { color: var(--green); }
+  .kubectl-hint kbd { padding: .15rem .4rem; border: 1px solid var(--border); border-radius: 3px; font-size: .7rem; }
+  .kubectl-overlay { position: fixed; inset: 0; z-index: 500; display: flex; align-items: flex-end; justify-content: center; padding: 1.5rem; background: rgba(10,14,26,.88); backdrop-filter: blur(4px); }
+  .kubectl-panel { width: 100%; max-width: 750px; border: 1px solid rgba(0,255,136,.25); border-radius: 10px; overflow: hidden; box-shadow: 0 0 60px rgba(0,255,136,.15); background: var(--surface); }
+  .kubectl-output { padding: 1rem; height: 260px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: .75rem; line-height: 1.6; }
+  .kubectl-input-row { display: flex; align-items: center; gap: .5rem; padding: .6rem 1rem; border-top: 1px solid var(--border); background: var(--bg); }
+  .kubectl-prompt { font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--green); white-space: nowrap; }
+  .kubectl-input-row input { flex: 1; background: none; border: none; outline: none; font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--text); caret-color: var(--green); }
+
+  /* Certs */
+  .certs-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .cert-card { display: flex; align-items: center; gap: 1rem; border: 1px solid rgba(0,255,136,.15); background: rgba(17,24,39,.8); border-radius: 10px; padding: 1rem 1.25rem; transition: border-color .3s; }
+  .cert-badge { width: 48px; height: 48px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: .7rem; font-weight: 700; flex-shrink: 0; }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--border); padding: 2rem; text-align: center; }
+  footer p { font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--muted); margin: .25rem 0; }
+
+  /* Page switcher */
+  .page-switcher { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 200; display: flex; gap: .5rem; }
+  .page-btn { font-family: 'JetBrains Mono', monospace; font-size: .75rem; padding: .5rem 1rem; border-radius: 6px; cursor: pointer; border: 1px solid; transition: all .2s; }
+  .page-btn.active { background: var(--green); color: var(--bg); border-color: var(--green); }
+  .page-btn:not(.active) { background: var(--surface); color: var(--dim); border-color: var(--border); }
+  .page-btn:not(.active):hover { border-color: var(--green); color: var(--green); }
+  .page { display: none; } .page.active { display: block; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo mono">
+    <span class="g">scott</span><span class="d">@</span><span class="c">ivan</span><span class="d">:~$</span>
+    <span class="cursor-blink"></span>
+  </a>
+  <div class="nav-links">
+    <a href="#" onclick="showPage('home');return false;" id="nav-home" class="active">~/</a>
+    <a href="#" onclick="showPage('resume');return false;" id="nav-resume">./resume</a>
+    <a href="https://github.com" target="_blank">github ↗</a>
+    <a href="https://linkedin.com" target="_blank">linkedin ↗</a>
+  </div>
+</nav>
+
+<!-- ======== HOME ======== -->
+<div id="page-home" class="page active">
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="terminal-win">
+        <div class="terminal-bar">
+          <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          <span class="terminal-title">scott@scottivan.com:~</span>
+        </div>
+        <div class="terminal-body" id="terminal-output"></div>
+      </div>
+
+      <div class="hero-right">
+        <div>
+          <p class="mono" style="color:var(--green);font-size:.8rem;margin-bottom:.5rem;">// hello world</p>
+          <h1 class="hero-name">Scott<br><span>Ivan</span></h1>
+          <p class="hero-desc" style="margin-top:1rem;">
+            Platform Engineer building cloud-native infrastructure.
+            Currently architecting a three-tier EKS management platform with Argo CD at USAA.
+          </p>
+        </div>
+        <div class="stats">
+          <div class="stat-card"><div class="stat-val mono glow-green">CKA</div><div class="stat-sub mono">Certified</div></div>
+          <div class="stat-card"><div class="stat-val mono glow-green">USAA</div><div class="stat-sub mono">Enterprise</div></div>
+          <div class="stat-card"><div class="stat-val mono glow-green">EKS</div><div class="stat-sub mono">Building Now</div></div>
+        </div>
+        <div class="ctas">
+          <a href="#" class="btn-primary" onclick="showPage('resume');return false;">cat resume.md</a>
+          <a href="mailto:hello@scottivan.com" class="btn-outline">./contact</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills -->
+  <section style="background:rgba(17,24,39,.3);">
+    <div class="section-inner">
+      <p class="section-cmd mono">$ cat skills.json</p>
+      <h2 class="section-title">Technical Stack</h2>
+      <div class="skills-grid" id="skills-grid"></div>
+    </div>
+  </section>
+
+  <!-- Certs -->
+  <section>
+    <div class="section-inner">
+      <p class="section-cmd mono">$ ls ./certifications/</p>
+      <div class="certs-row" style="margin-top:1rem;">
+        <div class="cert-card">
+          <div class="cert-badge" style="background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.35);color:var(--green);">CKA</div>
+          <div><div style="font-size:.9rem;font-weight:600;color:var(--text);">Certified Kubernetes Administrator</div><div class="mono" style="font-size:.7rem;color:var(--dim);margin-top:.25rem;">Cloud Native Computing Foundation (CNCF)</div></div>
+        </div>
+        <div class="cert-card">
+          <div class="cert-badge" style="background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.35);color:var(--cyan);">ML</div>
+          <div><div style="font-size:.9rem;font-weight:600;color:var(--text);">Machine Learning Certificate</div><div class="mono" style="font-size:.7rem;color:var(--dim);margin-top:.25rem;">Cornell University</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Chess stats -->
+  <section style="background:rgba(17,24,39,.3);">
+    <div class="section-inner">
+      <p class="section-cmd mono">$ curl lichess.org/api/user/scottivn | jq .perfs</p>
+      <div class="chess-box" style="margin-top:.75rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:.75rem;">
+            <span style="font-size:1.5rem;">♟️</span>
+            <div>
+              <span style="font-weight:600;color:var(--text);">scottivn</span>
+              <span class="mono" style="font-size:.7rem;color:var(--muted);margin-left:.5rem;">on lichess.org</span>
+            </div>
+          </div>
+          <a href="https://lichess.org/@/scottivn" target="_blank" class="mono" style="font-size:.72rem;color:var(--cyan);text-decoration:none;">view profile ↗</a>
+        </div>
+        <div class="chess-grid">
+          <div class="chess-card" style="background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.25);">
+            <div class="mono" style="font-size:1.2rem;font-weight:700;color:var(--red);">1526</div>
+            <div class="mono" style="font-size:.72rem;color:var(--text);margin-top:.2rem;">Blitz</div>
+            <div class="mono" style="font-size:.65rem;color:var(--muted);">2,736 games</div>
+          </div>
+          <div class="chess-card" style="background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);">
+            <div class="mono" style="font-size:1.2rem;font-weight:700;color:var(--cyan);">1526</div>
+            <div class="mono" style="font-size:.72rem;color:var(--text);margin-top:.2rem;">Rapid</div>
+            <div class="mono" style="font-size:.65rem;color:var(--muted);">1,003 games</div>
+          </div>
+          <div class="chess-card" style="background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);">
+            <div class="mono" style="font-size:1.2rem;font-weight:700;color:var(--yellow);">2394</div>
+            <div class="mono" style="font-size:.72rem;color:var(--text);margin-top:.2rem;">Correspondence</div>
+            <div class="mono" style="font-size:.65rem;color:var(--muted);">16 games</div>
+          </div>
+          <div class="chess-card" style="background:rgba(0,255,136,.08);border:1px solid rgba(0,255,136,.25);">
+            <div class="mono" style="font-size:1.2rem;font-weight:700;color:var(--green);">1744</div>
+            <div class="mono" style="font-size:.72rem;color:var(--text);margin-top:.2rem;">Puzzles</div>
+            <div class="mono" style="font-size:.65rem;color:var(--muted);">18,709 puzzles</div>
+          </div>
+        </div>
+        <div class="mono" style="font-size:.68rem;color:var(--muted);margin-top:.75rem;">Member since Feb 2021 · 17 days, 6 hours played · 3,775 total games</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interests -->
+  <section>
+    <div class="section-inner">
+      <p class="section-cmd mono">$ echo $INTERESTS | tr " " "\n"</p>
+      <h2 class="section-title">Beyond the Terminal</h2>
+      <div class="interests-grid">
+        <div class="interest-card">
+          <div class="interest-icon">⚔️</div>
+          <div class="interest-name">Brazilian Jiu-Jitsu</div>
+          <div class="interest-desc mono">Purple belt · Rodrigo Pinheiro BJJ · Boerne, TX</div>
+        </div>
+        <div class="interest-card">
+          <div class="interest-icon">♟️</div>
+          <div class="interest-name">Chess</div>
+          <div class="interest-desc mono">1526 Blitz · 2394 Correspondence · lichess: scottivn</div>
+        </div>
+        <div class="interest-card">
+          <div class="interest-icon">📈</div>
+          <div class="interest-name">Investing</div>
+          <div class="interest-desc mono">Systematic, data-driven approach</div>
+        </div>
+        <div class="interest-card">
+          <div class="interest-icon">🖥️</div>
+          <div class="interest-name">Programming</div>
+          <div class="interest-desc mono">Always learning, always shipping</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- kubectl hint -->
+  <div class="kubectl-hint">
+    <button onclick="openKubectl()">
+      <kbd>Ctrl+K</kbd> open kubectl terminal
+    </button>
+  </div>
+
+  <footer>
+    <p><span style="color:var(--green);" class="mono">scott@scottivan.com</span>:~$ exit</p>
+    <p>built with next.js · deployed on vercel · © 2025</p>
+  </footer>
+</div>
+
+<!-- ======== RESUME ======== -->
+<div id="page-resume" class="page">
+  <section style="padding-top:6rem;">
+    <div class="section-inner" style="max-width:900px;">
+
+      <p class="section-cmd mono">$ cat resume.md</p>
+      <div class="resume-box" style="margin-bottom:2rem;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+          <div>
+            <h1 style="font-size:2rem;font-weight:700;color:white;">Scott Ivan</h1>
+            <p class="mono" style="color:var(--green);font-size:.8rem;margin-top:.35rem;">Platform Engineer · DevSecOps · Cloud Native</p>
+            <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:.75rem;">
+              <a href="#" class="mono" style="font-size:.7rem;color:var(--dim);text-decoration:none;">hello@scottivan.com</a>
+              <a href="#" class="mono" style="font-size:.7rem;color:var(--dim);text-decoration:none;">github.com/scottivan</a>
+              <a href="#" class="mono" style="font-size:.7rem;color:var(--dim);text-decoration:none;">linkedin.com/in/scottivan</a>
+              <a href="https://lichess.org/@/scottivn" target="_blank" class="mono" style="font-size:.7rem;color:var(--dim);text-decoration:none;">lichess.org/@/scottivn</a>
+            </div>
+          </div>
+          <a href="#" class="btn-outline" style="font-size:.75rem;padding:.5rem 1rem;">↓ download PDF</a>
+        </div>
+      </div>
+
+      <div style="margin-bottom:2rem;">
+        <p class="section-cmd mono" style="margin-bottom:.6rem;">// summary</p>
+        <p style="color:var(--dim);line-height:1.8;font-size:.9rem;">
+          Platform engineer with hands-on experience building and operating enterprise Kubernetes infrastructure at USAA. Transitioned from on-premises OpenShift to leading EKS platform engineering, designing a three-tier cluster management architecture using Argo CD. CKA certified with a Machine Learning certificate from Cornell. Built PatientSynapse — an AI-powered workflow automation platform for a medical practice, hosted on AWS. Passionate about GitOps, policy-as-code, and developer platforms that get out of the way.
+        </p>
+      </div>
+
+      <p class="section-cmd mono" style="margin-bottom:1.5rem;">$ git log --all --format="%s"</p>
+      <div class="timeline" style="margin-bottom:3rem;">
+
+        <div class="timeline-item">
+          <div class="timeline-dot" style="border-color:var(--green);background:rgba(0,255,136,.1);"></div>
+          <div class="resume-box" style="flex:1;">
+            <div class="job-header">
+              <div>
+                <div class="job-role">Platform Engineer — DevSecOps</div>
+                <div class="job-team mono" style="color:var(--green);">USAA · EKS / DevSecRegOps Team</div>
+              </div>
+              <div class="job-period mono">2024 – Present</div>
+            </div>
+            <ul class="job-bullets">
+              <li>Architecting a three-tier EKS cluster management platform using Argo CD for cluster syncs and lifecycle management</li>
+              <li>Building GitOps-driven infrastructure pipelines for multi-cluster governance across enterprise environments</li>
+              <li>Designing DevSecOps-native workflows integrating security scanning, policy enforcement, and automated compliance</li>
+              <li>Leading shift-left security practices with OPA/Kyverno policy-as-code for cluster governance</li>
+            </ul>
+            <div class="tags">
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">EKS</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">Argo CD</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">Kubernetes</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">OPA</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">Kyverno</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">GitOps</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot" style="border-color:var(--cyan);background:rgba(0,212,255,.1);"></div>
+          <div class="resume-box" style="flex:1;">
+            <div class="job-header">
+              <div>
+                <div class="job-role">Platform Engineer — Containers as a Service</div>
+                <div class="job-team mono" style="color:var(--cyan);">USAA · OpenShift / On-Prem Cloud Team</div>
+              </div>
+              <div class="job-period mono">2021 – 2024</div>
+            </div>
+            <ul class="job-bullets">
+              <li>Built and managed enterprise-scale OpenShift clusters across on-premises data centers</li>
+              <li>Automated cluster provisioning, day-2 operations, and lifecycle management at scale</li>
+              <li>Developed internal tooling for cluster monitoring, alerting, and self-service developer workflows</li>
+              <li>Collaborated cross-functionally with application teams to migrate workloads to containerized infrastructure</li>
+            </ul>
+            <div class="tags">
+              <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">OpenShift</span>
+              <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Kubernetes</span>
+              <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Ansible</span>
+              <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Python</span>
+              <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Prometheus</span>
+              <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Helm</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot" style="border-color:var(--yellow);background:rgba(255,215,0,.1);"></div>
+          <div class="resume-box" style="flex:1;">
+            <div class="job-header">
+              <div>
+                <div class="job-role">Teaching Assistant — Computer Science</div>
+                <div class="job-team mono" style="color:var(--yellow);">University · Data Structures & Algorithms</div>
+              </div>
+              <div class="job-period mono">2019 – 2021</div>
+            </div>
+            <ul class="job-bullets">
+              <li>TA for CS courses covering data structures, algorithms, and OOP</li>
+              <li>Led weekly lab sessions and office hours for 30+ students per semester</li>
+            </ul>
+            <div class="tags">
+              <span class="tag" style="color:var(--yellow);border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.08);">Data Structures</span>
+              <span class="tag" style="color:var(--yellow);border-color:rgba(255,215,0,.3);background:rgba(255,215,0,.08);">Algorithms</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projects -->
+      <p class="section-cmd mono" style="margin-bottom:1rem;">$ ls ./projects/</p>
+      <div class="projects-grid" style="margin-bottom:3rem;">
+        <div class="project-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:600;color:var(--text);">PatientSynapse</span>
+            <a href="https://patientsynapse.com" target="_blank" class="mono" style="font-size:.72rem;color:var(--green);text-decoration:none;">visit ↗</a>
+          </div>
+          <p style="color:var(--dim);font-size:.83rem;line-height:1.6;">Web-based AI automation platform built to streamline workflows for a medical practice. Handles intake, scheduling, and process automation using LLMs, hosted on AWS.</p>
+          <div class="tags">
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">AWS</span>
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">Python</span>
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">AI/LLMs</span>
+          </div>
+        </div>
+        <div class="project-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-weight:600;color:var(--text);">scottivan.com</span>
+            <a href="#" class="mono" style="font-size:.72rem;color:var(--cyan);text-decoration:none;">this site ↗</a>
+          </div>
+          <p style="color:var(--dim);font-size:.83rem;line-height:1.6;">Personal portfolio and playground. Terminal-themed, built with Next.js, deployed on Vercel.</p>
+          <div class="tags">
+            <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Next.js</span>
+            <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">TypeScript</span>
+            <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Vercel</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills matrix -->
+      <p class="section-cmd mono" style="margin-bottom:1rem;">$ cat skills.json | jq</p>
+      <div class="resume-box skills-matrix" style="margin-bottom:2.5rem;">
+        <div class="skill-cat"><h4 style="color:var(--green);">Cloud &amp; Orchestration</h4><div class="tags"><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Kubernetes</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">EKS</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">OpenShift</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Helm</span></div></div>
+        <div class="skill-cat"><h4 style="color:var(--green);">GitOps &amp; CD</h4><div class="tags"><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Argo CD</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Argo Workflows</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">GitHub Actions</span></div></div>
+        <div class="skill-cat"><h4 style="color:var(--cyan);">DevSecOps</h4><div class="tags"><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">OPA</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Kyverno</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Policy-as-Code</span></div></div>
+        <div class="skill-cat"><h4 style="color:var(--cyan);">IaC &amp; Automation</h4><div class="tags"><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Terraform</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Ansible</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Python</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Go</span></div></div>
+        <div class="skill-cat"><h4 style="color:var(--yellow);">Observability</h4><div class="tags"><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Prometheus</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Grafana</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">OpenTelemetry</span></div></div>
+        <div class="skill-cat"><h4 style="color:var(--yellow);">Languages</h4><div class="tags"><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Python</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Go</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">Bash</span><span class="tag" style="color:var(--dim);border-color:var(--border);background:var(--border);">TypeScript</span></div></div>
+      </div>
+
+      <!-- Education -->
+      <p class="section-cmd mono" style="margin-bottom:.75rem;">// education</p>
+      <div class="resume-box" style="margin-bottom:2rem;">
+        <div style="font-weight:600;color:var(--text);">B.A., Computer and Programming Sciences</div>
+        <div class="mono" style="color:var(--cyan);font-size:.75rem;margin-top:.35rem;">Minor in Mathematics</div>
+        <div class="mono" style="color:var(--muted);font-size:.7rem;margin-top:.25rem;">Teaching Assistant — Data Structures & Algorithms</div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:1.5rem;border-top:1px solid var(--border);">
+        <a href="#" onclick="showPage('home');return false;" class="mono" style="color:var(--dim);text-decoration:none;font-size:.85rem;" onmouseover="this.style.color='var(--green)'" onmouseout="this.style.color='var(--dim)'">← cd ~/</a>
+        <a href="mailto:hello@scottivan.com" class="btn-primary">./contact</a>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- kubectl overlay -->
+<div id="kubectl-overlay" style="display:none;" class="kubectl-overlay" onclick="if(event.target===this)closeKubectl()">
+  <div class="kubectl-panel">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+      <span class="terminal-title" style="flex:1;margin-left:.5rem;">scott@scottivan.com — kubectl</span>
+      <button onclick="closeKubectl()" style="background:none;border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);">esc</button>
+    </div>
+    <div class="kubectl-output" id="kubectl-output">
+      <div style="color:var(--dim);">Type "help" for available commands. Press Ctrl+K to toggle.</div>
+    </div>
+    <div class="kubectl-input-row">
+      <span class="kubectl-prompt">scott@scottivan.com:~$ </span>
+      <input id="kubectl-input" onkeydown="kubectlKey(event)" placeholder="type a command..." autocomplete="off" spellcheck="false" />
+    </div>
+  </div>
+</div>
+
+<!-- Page switcher -->
+<div class="page-switcher">
+  <button class="page-btn active" onclick="showPage('home')" id="btn-home">~/</button>
+  <button class="page-btn" onclick="showPage('resume')" id="btn-resume">resume</button>
+</div>
+
+<script>
+// ---- Page switch ----
+function showPage(name) {
+  ['home','resume'].forEach(p => {
+    document.getElementById('page-'+p).classList.toggle('active', p===name);
+    document.getElementById('btn-'+p).classList.toggle('active', p===name);
+    const n = document.getElementById('nav-'+p);
+    if(n) n.classList.toggle('active', p===name);
+  });
+}
+
+// ---- Typewriter ----
+const lines = [
+  {t:'$ whoami',c:'line-cmd'},{t:'  scott ivan',c:'line-out'},{t:'',c:''},
+  {t:'$ cat profile.txt',c:'line-cmd'},
+  {t:'  Platform Engineer | DevSecOps | Cloud Native',c:'line-out'},
+  {t:'  CKA Certified | Cornell ML | OpenShift → EKS',c:'line-out'},{t:'',c:''},
+  {t:'$ kubectl get pods -n expertise',c:'line-cmd'},
+  {t:'  NAME                    READY   STATUS',c:'line-pod'},
+  {t:'  kubernetes-eks          1/1     Running',c:'line-pod'},
+  {t:'  argo-cd-gitops          1/1     Running',c:'line-pod'},
+  {t:'  devsecops               1/1     Running',c:'line-pod'},
+  {t:'  python-ml               1/1     Running',c:'line-pod'},
+  {t:'  golang                  1/1     Running',c:'line-pod'},{t:'',c:''},
+  {t:'$ echo $INTERESTS',c:'line-cmd'},
+  {t:'  jiujitsu chess investing golang',c:'line-out'},
+];
+(function(){
+  const out = document.getElementById('terminal-output');
+  let li=0,ci=0;
+  let el=null;
+  function tick(){
+    if(li>=lines.length){const c=document.createElement('span');c.className='cursor-blink';out.appendChild(c);return;}
+    const l=lines[li];
+    if(!el){el=document.createElement('div');el.className=l.c;out.appendChild(el);}
+    if(l.t===''){li++;ci=0;el=null;setTimeout(tick,80);return;}
+    if(ci<=l.t.length){el.textContent=l.t.slice(0,ci);ci++;setTimeout(tick,28);}
+    else{li++;ci=0;el=null;setTimeout(tick,l.c==='line-cmd'?200:60);}
+  }
+  setTimeout(tick,500);
+})();
+
+// ---- Skills bars ----
+const skillData=[
+  {label:'Kubernetes / EKS',level:95,color:'#00ff88'},
+  {label:'OpenShift',level:90,color:'#00ff88'},
+  {label:'Argo CD / GitOps',level:88,color:'#00d4ff'},
+  {label:'DevSecOps',level:85,color:'#00d4ff'},
+  {label:'Python / Machine Learning',level:78,color:'#ffd700'},
+  {label:'Go (Golang)',level:72,color:'#ffd700'},
+];
+const sg=document.getElementById('skills-grid');
+skillData.forEach(({label,level,color})=>{
+  sg.innerHTML+=`<div><div class="skill-meta"><span class="mono" style="color:var(--text)">${label}</span><span class="mono" style="color:${color}">${level}%</span></div><div class="skill-track"><div class="skill-fill" data-w="${level}" style="width:0;background:linear-gradient(90deg,${color},${color}88);box-shadow:0 0 8px ${color}55;"></div></div></div>`;
+});
+new IntersectionObserver(e=>{
+  if(e[0].isIntersecting) document.querySelectorAll('.skill-fill').forEach(el=>el.style.width=el.dataset.w+'%');
+},{threshold:.2}).observe(sg);
+
+// ---- kubectl easter egg ----
+const KB_COMMANDS = {
+  'kubectl get pods':['NAME                          READY   STATUS    RESTARTS   AGE','platform-engineer-usaa        1/1     Running   0          3y','openshift-veteran             1/1     Running   0          3y','argo-cd-architect             1/1     Running   0          1y','cka-certified                 1/1     Running   0          2y','cornell-ml                    1/1     Running   0          2y','patientsynapse-founder        1/1     Running   0          1y','bjj-purple-belt               1/1     Running   0          4y','chess-player-1526blitz        1/1     Running   0          5y'],
+  'kubectl get pods -n expertise':['NAME                          READY   STATUS    RESTARTS   AGE','kubernetes-eks                1/1     Running   0          3y','argo-cd-gitops                1/1     Running   0          1y','devsecops                     1/1     Running   0          1y','python-ml                     1/1     Running   0          2y','golang                        1/1     Running   0          6m','openshift                     1/1     Running   0          3y','terraform-ansible             1/1     Running   0          3y'],
+  'kubectl get nodes':['NAME            STATUS   ROLES           AGE   VERSION','brain           Ready    control-plane   28y   v1.28.0','hands           Ready    worker          28y   v1.28.0','coffee          Ready    worker          10y   v1.28.0'],
+  'kubectl get namespaces':['NAME          STATUS   AGE','work          Active   4y','side-projects Active   1y','chess         Active   5y','jiujitsu      Active   4y','investing     Active   3y','learning      Active   28y'],
+  'kubectl get svc':['NAME              TYPE           CLUSTER-IP    PORT(S)','scottivan.com     LoadBalancer   10.0.0.1      443/TCP','patientsynapse    LoadBalancer   10.0.0.2      443/TCP','lichess-scottivn  ExternalName   lichess.org   -'],
+  'kubectl top pods':['NAME                          CPU(cores)   MEMORY(bytes)','platform-engineer-usaa        420m         8Gi','bjj-purple-belt               800m         2Gi','chess-player-1526blitz        350m         1Gi','coffee                        9999m        unlimited'],
+  'kubectl logs patientsynapse-founder':['[INFO]  Built web-based AI automation for a medical practice','[INFO]  Stack: AWS, Python, LLMs','[INFO]  Deployed at patientsynapse.com','[INFO]  Streamlines patient intake, scheduling, and process workflows','[INFO]  Status: RUNNING'],
+  'kubectl describe pod platform-engineer-usaa':['Name:    platform-engineer-usaa','Company: USAA','Team:    DevSecRegOps / EKS','','Containers:','  eks-architect: argo-cd:three-tier-management — Running','  devsecops: policy-as-code:kyverno-opa — Running','','Conditions: Initialized=True  Ready=True  CKA=True'],
+  'whoami':['scott ivan','platform engineer @ usaa','cka · cornell ml · purple belt · 1526 blitz'],
+  'ls':['resume/   projects/   certifications/   interests/   contact/'],
+  'pwd':['/home/scott'],
+  'uname':['scottOS 28.0.0 x86_64 GNU/Linux'],
+  'exit':['Nice try. You can\'t escape.'],
+  'help':['Available commands:','','  kubectl get pods','  kubectl get pods -n expertise','  kubectl get nodes','  kubectl get namespaces','  kubectl get svc','  kubectl top pods','  kubectl logs patientsynapse-founder','  kubectl describe pod platform-engineer-usaa','  whoami · ls · pwd · uname · clear','','  Tab = autocomplete  ·  ↑↓ = history'],
+};
+let kbHistory=[], kbHistIdx=-1;
+function openKubectl(){document.getElementById('kubectl-overlay').style.display='flex';document.getElementById('kubectl-input').focus();}
+function closeKubectl(){document.getElementById('kubectl-overlay').style.display='none';}
+document.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='k'){e.preventDefault();const o=document.getElementById('kubectl-overlay');if(o.style.display==='none'||!o.style.display){openKubectl();}else{closeKubectl();}}if(e.key==='Escape')closeKubectl();});
+function kubectlKey(e){
+  const inp=document.getElementById('kubectl-input');
+  if(e.key==='Enter'){
+    const cmd=inp.value.trim().toLowerCase();
+    if(!cmd)return;
+    if(cmd==='clear'){document.getElementById('kubectl-output').innerHTML='<div style="color:var(--dim)">Terminal cleared.</div>';inp.value='';kbHistIdx=-1;return;}
+    const out=KB_COMMANDS[cmd]||[`bash: ${cmd}: command not found`,'Try "help" to see available commands.'];
+    const o=document.getElementById('kubectl-output');
+    o.innerHTML+=`<div style="color:var(--green)">scott@scottivan.com:~$ ${inp.value}</div>`;
+    out.forEach(l=>o.innerHTML+=`<div style="color:var(--dim)">${l||'&nbsp;'}</div>`);
+    o.scrollTop=o.scrollHeight;
+    kbHistory.unshift(inp.value); inp.value=''; kbHistIdx=-1;
+  } else if(e.key==='ArrowUp'){e.preventDefault();kbHistIdx=Math.min(kbHistIdx+1,kbHistory.length-1);inp.value=kbHistory[kbHistIdx]||'';}
+  else if(e.key==='ArrowDown'){e.preventDefault();kbHistIdx=Math.max(kbHistIdx-1,-1);inp.value=kbHistIdx===-1?'':kbHistory[kbHistIdx]||'';}
+  else if(e.key==='Tab'){e.preventDefault();const m=Object.keys(KB_COMMANDS).find(c=>c.startsWith(inp.value)&&c!==inp.value);if(m)inp.value=m;}
+}
+</script>
+</body>
+</html>
