@@ -5,8 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "python3 -m http.server 3000 -d out",
+    "preview": "python3 -m http.server 3000 -d out",
+    "lint": "next lint",
+    "aws:infra": "bash scripts/deploy-aws.sh",
+    "aws:deploy": "bash scripts/deploy-all.sh",
+    "aws:publish": "bash scripts/publish-site.sh",
+    "aws:allowlist-ip": "bash scripts/update-allowlist-ip.sh",
+    "aws:budget": "bash scripts/setup-budget.sh"
   },
   "dependencies": {
     "next": "^14.2.0",

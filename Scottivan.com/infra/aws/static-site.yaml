@@ -1,0 +1,263 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Static AWS hosting for scottivan.com with CloudFront, ACM, and WAF IP allowlisting.
+
+Parameters:
+  SiteDomainName:
+    Type: String
+    Description: Primary custom domain name for the site.
+  EnableCustomDomain:
+    Type: String
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Default: 'false'
+    Description: Set to true to attach the custom domain and ACM certificate.
+  SiteBucketName:
+    Type: String
+    Description: Globally unique S3 bucket name for the site artifacts.
+  AllowedIPv4Cidr:
+    Type: String
+    Description: Initial IPv4 CIDR allowed to reach the site through WAF.
+  CreateRoute53Records:
+    Type: String
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Default: 'false'
+    Description: Set to true to create Route 53 alias records in the hosted zone below.
+  Route53HostedZoneId:
+    Type: String
+    Default: ''
+    Description: Hosted zone ID to use when CreateRoute53Records is true.
+  PriceClass:
+    Type: String
+    Default: PriceClass_100
+    AllowedValues:
+      - PriceClass_100
+      - PriceClass_200
+      - PriceClass_All
+    Description: CloudFront price class.
+  ProjectTagValue:
+    Type: String
+    Default: scottivan-site
+    Description: Tag value used for project cost attribution and budgets.
+
+Conditions:
+  UseCustomDomain: !Equals [!Ref EnableCustomDomain, 'true']
+  UseRoute53: !Equals [!Ref CreateRoute53Records, 'true']
+  HasHostedZone: !Not [!Equals [!Ref Route53HostedZoneId, '']]
+  CreateDnsRecords: !And [!Condition UseRoute53, !Condition HasHostedZone, !Condition UseCustomDomain]
+
+Resources:
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref SiteBucketName
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+        - Key: App
+          Value: static-site
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+
+  OriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Join
+          - '-'
+          - - !Ref AWS::StackName
+            - !Select [2, !Split ['/', !Ref AWS::StackId]]
+            - oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  AllowedIpSet:
+    Type: AWS::WAFv2::IPSet
+    Properties:
+      Name: !Join
+        - '-'
+        - - !Ref AWS::StackName
+          - !Select [2, !Split ['/', !Ref AWS::StackId]]
+          - allowlist
+      Scope: CLOUDFRONT
+      IPAddressVersion: IPV4
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+        - Key: App
+          Value: static-site
+      Addresses:
+        - !Ref AllowedIPv4Cidr
+
+  WebAcl:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Join
+        - '-'
+        - - !Ref AWS::StackName
+          - !Select [2, !Split ['/', !Ref AWS::StackId]]
+          - web-acl
+      Scope: CLOUDFRONT
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+        - Key: App
+          Value: static-site
+      DefaultAction:
+        Block: {}
+      VisibilityConfig:
+        CloudWatchMetricsEnabled: true
+        MetricName: !Sub '${AWS::StackName}-web-acl'
+        SampledRequestsEnabled: true
+      Rules:
+        - Name: AllowConfiguredIpSet
+          Priority: 0
+          Action:
+            Allow: {}
+          Statement:
+            IPSetReferenceStatement:
+              Arn: !GetAtt AllowedIpSet.Arn
+          VisibilityConfig:
+            CloudWatchMetricsEnabled: true
+            MetricName: !Sub '${AWS::StackName}-allowlist'
+            SampledRequestsEnabled: true
+
+  Certificate:
+    Type: AWS::CertificateManager::Certificate
+    Condition: UseCustomDomain
+    Properties:
+      DomainName: !Ref SiteDomainName
+      ValidationMethod: DNS
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+        - Key: App
+          Value: static-site
+
+  Distribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+        - Key: App
+          Value: static-site
+      DistributionConfig:
+        Enabled: true
+        Aliases: !If
+          - UseCustomDomain
+          - - !Ref SiteDomainName
+          - !Ref AWS::NoValue
+        DefaultRootObject: index.html
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        PriceClass: !Ref PriceClass
+        Origins:
+          - Id: site-bucket-origin
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt OriginAccessControl.Id
+            S3OriginConfig: {}
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          Compress: true
+          ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03
+          TargetOriginId: site-bucket-origin
+          ViewerProtocolPolicy: redirect-to-https
+        CustomErrorResponses:
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+        ViewerCertificate: !If
+          - UseCustomDomain
+          - AcmCertificateArn: !Ref Certificate
+            MinimumProtocolVersion: TLSv1.2_2021
+            SslSupportMethod: sni-only
+          - CloudFrontDefaultCertificate: true
+        WebACLId: !GetAtt WebAcl.Arn
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontRead
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${SiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${Distribution}'
+
+  DnsRecordV4:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref Route53HostedZoneId
+      Name: !Ref SiteDomainName
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt Distribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+  DnsRecordV6:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref Route53HostedZoneId
+      Name: !Ref SiteDomainName
+      Type: AAAA
+      AliasTarget:
+        DNSName: !GetAtt Distribution.DomainName
+        HostedZoneId: Z2FDTNDATAQYW2
+
+Outputs:
+  SiteBucketName:
+    Value: !Ref SiteBucket
+  DistributionId:
+    Value: !Ref Distribution
+  DistributionDomainName:
+    Value: !GetAtt Distribution.DomainName
+  SiteUrl:
+    Value: !If
+      - UseCustomDomain
+      - !Sub 'https://${SiteDomainName}'
+      - !Sub 'https://${Distribution.DomainName}'
+  WebAclArn:
+    Value: !GetAtt WebAcl.Arn
+  WafIpSetId:
+    Value: !GetAtt AllowedIpSet.Id
+  WafIpSetName:
+    Value: !Join
+      - '-'
+      - - !Ref AWS::StackName
+        - !Select [2, !Split ['/', !Ref AWS::StackId]]
+        - allowlist
+  CertificateArn:
+    Condition: UseCustomDomain
+    Value: !Ref Certificate
