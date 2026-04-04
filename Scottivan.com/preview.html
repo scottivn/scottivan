@@ -302,6 +302,40 @@
     </div>
   </section>
 
+  <!-- PatientSynapse callout -->
+  <section style="padding-top:0;padding-bottom:2rem;">
+    <div class="section-inner">
+      <p class="section-cmd mono">$ cat ./projects/patientsynapse.md</p>
+      <div style="border:1px solid rgba(0,255,136,.3);background:rgba(17,24,39,.8);border-radius:10px;padding:1.25rem;margin-top:.6rem;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;">
+              <span style="font-weight:600;color:var(--text);">PatientSynapse</span>
+              <span class="mono" style="font-size:.65rem;padding:.15rem .45rem;border-radius:4px;background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.35);color:var(--green);">side project</span>
+            </div>
+            <p style="color:var(--dim);font-size:.85rem;line-height:1.7;margin-bottom:.75rem;">
+              AI automation platform for a sleep medicine practice — fax intake OCR'd, extracted via LLM, matched to FHIR R4 records, and pushed to the EMR. Manages DME/CPAP lifecycle, prior auth tracking, and revenue cycle. FastAPI + React + AWS, HIPAA-compliant.
+            </p>
+            <div class="tags">
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">FastAPI</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">React</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">FHIR R4</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">LLMs</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">OCR</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">AWS</span>
+              <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">RBAC</span>
+            </div>
+          </div>
+          <a href="https://patientsynapse.com/login" target="_blank"
+            style="font-family:'JetBrains Mono',monospace;font-size:.8rem;padding:.6rem 1.1rem;background:var(--green);color:var(--bg);border-radius:6px;font-weight:700;text-decoration:none;white-space:nowrap;align-self:flex-start;transition:box-shadow .3s;"
+            onmouseover="this.style.boxShadow='0 0 15px rgba(0,255,136,.5)'" onmouseout="this.style.boxShadow='none'">
+            try demo →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- kubectl hint -->
   <div class="kubectl-hint">
     <button onclick="openKubectl()">
@@ -425,28 +459,55 @@
 
       <!-- Projects -->
       <p class="section-cmd mono" style="margin-bottom:1rem;">$ ls ./projects/</p>
-      <div class="projects-grid" style="margin-bottom:3rem;">
-        <div class="project-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-weight:600;color:var(--text);">PatientSynapse</span>
-            <a href="https://patientsynapse.com" target="_blank" class="mono" style="font-size:.72rem;color:var(--green);text-decoration:none;">visit ↗</a>
+      <div style="display:flex;flex-direction:column;gap:1rem;margin-bottom:3rem;">
+
+        <!-- PatientSynapse — featured -->
+        <div style="border:1px solid rgba(0,255,136,.4);background:rgba(17,24,39,.8);border-radius:10px;padding:1.25rem;display:flex;flex-direction:column;gap:.85rem;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:.75rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;">
+              <span style="font-weight:600;color:var(--text);">PatientSynapse</span>
+              <span class="mono" style="font-size:.62rem;padding:.15rem .45rem;border-radius:4px;background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.4);color:var(--green);">featured</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.75rem;">
+              <a href="https://patientsynapse.com/login" target="_blank"
+                style="font-family:'JetBrains Mono',monospace;font-size:.72rem;padding:.35rem .8rem;background:var(--green);color:var(--bg);border-radius:5px;font-weight:700;text-decoration:none;white-space:nowrap;">
+                try demo →
+              </a>
+              <a href="https://patientsynapse.com" target="_blank" class="mono" style="font-size:.72rem;color:var(--green);text-decoration:none;">visit ↗</a>
+            </div>
           </div>
-          <p style="color:var(--dim);font-size:.83rem;line-height:1.6;">Web-based AI automation platform built to streamline workflows for a medical practice. Handles intake, scheduling, and process automation using LLMs, hosted on AWS.</p>
+          <p style="color:var(--dim);font-size:.85rem;line-height:1.7;">
+            Full-stack AI automation platform for a sleep medicine practice. Automates the fax-to-EMR pipeline: inbound faxes are OCR'd, run through an LLM extraction layer, matched to FHIR R4 patient records, and pushed directly into the EMR — eliminating manual data entry. Also manages the full DME/CPAP supply lifecycle, HMO referral authorization tracking, and insurance allowable rate lookups.
+          </p>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem;">
+            <li style="display:flex;gap:.5rem;font-size:.8rem;color:var(--dim);"><span style="color:var(--green);flex-shrink:0;">›</span>OCR → LLM → FHIR R4 pipeline: PyMuPDF + Tesseract → Grok/OpenAI/Anthropic/Bedrock (hot-swappable) → eClinicalWorks / athenahealth</li>
+            <li style="display:flex;gap:.5rem;font-size:.8rem;color:var(--dim);"><span style="color:var(--green);flex-shrink:0;">›</span>HIPAA-compliant audit logging middleware, JWT + SMART on FHIR OAuth2, RBAC with role-scoped UI and backend guards</li>
+            <li style="display:flex;gap:.5rem;font-size:.8rem;color:var(--dim);"><span style="color:var(--green);flex-shrink:0;">›</span>DME prior authorization lifecycle, patient-facing confirmation flows, revenue cycle dashboard</li>
+            <li style="display:flex;gap:.5rem;font-size:.8rem;color:var(--dim);"><span style="color:var(--green);flex-shrink:0;">›</span>Deployed on AWS EC2 behind nginx with Let's Encrypt TLS and AWS Secrets Manager for credential injection</li>
+          </ul>
           <div class="tags">
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">FastAPI</span>
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">React</span>
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">PostgreSQL</span>
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">FHIR R4</span>
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">LLMs</span>
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">OCR</span>
             <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">AWS</span>
-            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">Python</span>
-            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">AI/LLMs</span>
+            <span class="tag" style="color:var(--green);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.08);">JWT/RBAC</span>
           </div>
         </div>
-        <div class="project-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
+
+        <!-- scottivan.com -->
+        <div style="border:1px solid rgba(0,212,255,.2);background:rgba(17,24,39,.8);border-radius:10px;padding:1.25rem;display:flex;flex-direction:column;gap:.75rem;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
             <span style="font-weight:600;color:var(--text);">scottivan.com</span>
             <a href="#" class="mono" style="font-size:.72rem;color:var(--cyan);text-decoration:none;">this site ↗</a>
           </div>
-          <p style="color:var(--dim);font-size:.83rem;line-height:1.6;">Personal portfolio and playground. Terminal-themed, built with Next.js, deployed on Vercel.</p>
+          <p style="color:var(--dim);font-size:.85rem;line-height:1.6;">Personal portfolio and playground. Terminal-themed, built with Next.js, deployed on Vercel.</p>
           <div class="tags">
             <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Next.js</span>
             <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">TypeScript</span>
+            <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Tailwind</span>
             <span class="tag" style="color:var(--cyan);border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.08);">Vercel</span>
           </div>
         </div>
