@@ -2,7 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background: #0a0e1a;
-  color: #e2e8f0;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: #FAFAF7;
+    color: #141414;
+  }
+
+  ::selection {
+    background: rgba(232, 85, 45, 0.15);
+    color: #141414;
+  }
+}
+
+/* Thick horizontal rule */
+.section-rule {
+  height: 1px;
+  background: #E5E2DD;
+  border: none;
+}
+
+.section-rule-thick {
+  height: 2px;
+  background: #141414;
+  border: none;
+}
+
+/* FAQ accordion */
+details summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] summary .faq-icon {
+  transform: rotate(45deg);
+}
+
+.faq-icon {
+  transition: transform 0.2s ease;
 }

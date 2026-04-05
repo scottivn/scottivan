@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { BrandHeader, BrandFooter, ModelBanner } from "@scottivan/shared";
+import { ModelBanner } from "@scottivan/shared";
 
-const MODEL_NAME = "Modern Brochure";
+const MODEL_NAME = "Local Business Studio";
 
 export const metadata: Metadata = {
-  title: `${MODEL_NAME} | scottivan.com`,
-  description: "A clean, fast single-page brochure site for service businesses. Customizable starter model by Scott Ivan.",
+  title: "Ivan Digital — Websites That Get You More Customers",
+  description:
+    "Conversion-focused websites for local businesses. More calls, more leads, more bookings. Built by Scott Ivan.",
 };
 
 export default function RootLayout({
@@ -15,12 +16,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body>
         <ModelBanner modelName={MODEL_NAME} />
-        <BrandHeader />
         <main>{children}</main>
-        <BrandFooter />
       </body>
     </html>
   );

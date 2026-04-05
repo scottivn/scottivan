@@ -7,9 +7,26 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        cream: "#FAFAF7",
+        ink: "#141414",
+        body: "#555555",
+        rule: "#E5E2DD",
+        warm: "#F5F2ED",
+        accent: "#E8552D",
+        "accent-hover": "#D14A24",
+        "accent-soft": "#FFF0EB",
+        "dark-surface": "#111111",
+        "dark-body": "#A0A0A0",
+        "dark-rule": "#2A2A2A",
+      },
       fontFamily: {
-        mono: ["JetBrains Mono", "Fira Code", "Cascadia Code", "monospace"],
-        sans: ["Inter", "system-ui", "sans-serif"],
+        serif: ["Georgia", "Times New Roman", "serif"],
+        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+      },
+      letterSpacing: {
+        tightest: "-0.04em",
+        "section": "0.15em",
       },
     },
   },
