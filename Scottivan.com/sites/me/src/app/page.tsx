@@ -1,5 +1,6 @@
 import Typewriter from "@/components/Typewriter";
 import KubectlEaster from "@/components/KubectlEaster";
+import ContactButton from "@/components/ContactButton";
 import Link from "next/link";
 
 const terminalLines = [
@@ -121,12 +122,11 @@ export default function Home() {
                 >
                   cat resume.md
                 </Link>
-                <a
-                  href="mailto:hello@scottivan.com"
+                <ContactButton
                   className="font-mono text-sm px-6 py-3 border border-[#00ff88]/30 text-[#00ff88] rounded hover:border-[#00ff88] hover:bg-[#00ff88]/5 transition-all"
                 >
                   ./contact
-                </a>
+                </ContactButton>
               </div>
             </div>
           </div>

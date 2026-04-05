@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ContactButton from "@/components/ContactButton";
 
 const experience = [
   {
@@ -113,8 +114,10 @@ export default function ResumePage() {
                   Platform Engineer · DevSecOps · Cloud Native
                 </p>
                 <div className="flex flex-wrap gap-3 mt-4">
+                  <ContactButton className="font-mono text-xs text-[#94a3b8] hover:text-[#00d4ff] transition-colors">
+                    contact
+                  </ContactButton>
                   {[
-                    { label: "hello@scottivan.com", href: "mailto:hello@scottivan.com" },
                     { label: "github.com/scottivan", href: "https://github.com" },
                     { label: "linkedin.com/in/scottivan", href: "https://www.linkedin.com/in/scott-ivan-4a2905134" },
                     { label: "lichess.org/@/scottivn", href: "https://lichess.org/@/scottivn" },
@@ -122,7 +125,7 @@ export default function ResumePage() {
                     <a
                       key={label}
                       href={href}
-                      target={href.startsWith("http") ? "_blank" : undefined}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="font-mono text-xs text-[#94a3b8] hover:text-[#00d4ff] transition-colors"
                     >
@@ -366,18 +369,17 @@ export default function ResumePage() {
 
         {/* Footer nav */}
         <div className="flex justify-between items-center pt-6 border-t border-[#1f2937]">
-          <Link
-            href="/"
+          <a
+            href="https://scottivan.com"
             className="font-mono text-sm text-[#94a3b8] hover:text-[#00ff88] transition-colors"
           >
             ← cd ~/
-          </Link>
-          <a
-            href="mailto:hello@scottivan.com"
+          </a>
+          <ContactButton
             className="font-mono text-sm px-5 py-2 bg-[#00ff88] text-[#0a0e1a] rounded font-bold hover:bg-[#00ff88]/90 transition-all"
           >
             ./contact
-          </a>
+          </ContactButton>
         </div>
       </div>
     </div>

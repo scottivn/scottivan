@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import models from "../../../../../models.json";
+import ContactModal from "../../components/ContactModal";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -14,6 +16,8 @@ const fadeUp = {
 };
 
 export default function ModelsPage() {
+  const [contactOpen, setContactOpen] = useState(false);
+
   return (
     <div className="min-h-screen">
       {/* Nav */}
@@ -28,12 +32,12 @@ export default function ModelsPage() {
           >
             about
           </a>
-          <a
-            href="mailto:hello@scottivan.com"
-            className="font-sans text-sm px-4 py-2 rounded-full border border-portal-muted text-portal-dim hover:border-portal-accent hover:text-portal-accent transition-all"
+          <button
+            onClick={() => setContactOpen(true)}
+            className="font-sans text-sm px-4 py-2 rounded-full border border-portal-muted text-portal-dim hover:border-portal-accent hover:text-portal-accent transition-all cursor-pointer"
           >
             contact
-          </a>
+          </button>
         </div>
       </nav>
 
@@ -206,12 +210,12 @@ export default function ModelsPage() {
             These are starting points. I&apos;ll build a tailored site for your business —
             your brand, your content, your domain.
           </p>
-          <a
-            href="mailto:hello@scottivan.com"
+          <button
+            onClick={() => setContactOpen(true)}
             className="inline-block font-sans text-sm px-8 py-3 bg-portal-accent text-portal-bg rounded-lg font-semibold hover:bg-portal-accent/90 transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.2)]"
           >
             Get Started
-          </a>
+          </button>
         </motion.div>
       </section>
 
@@ -224,14 +228,16 @@ export default function ModelsPage() {
           <a href="https://me.scottivan.com" className="font-sans text-xs text-portal-muted hover:text-portal-dim transition-colors">
             About
           </a>
-          <a href="mailto:hello@scottivan.com" className="font-sans text-xs text-portal-muted hover:text-portal-dim transition-colors">
+          <button onClick={() => setContactOpen(true)} className="font-sans text-xs text-portal-muted hover:text-portal-dim transition-colors">
             Contact
-          </a>
+          </button>
         </div>
         <p className="font-sans text-xs text-portal-muted mt-4">
           &copy; {new Date().getFullYear()} Scott Ivan
         </p>
       </footer>
+
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
     </div>
   );
 }

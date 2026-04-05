@@ -639,9 +639,9 @@ export default function LabPage() {
 
         {/* Footer nav */}
         <div className="mt-12 pt-8 border-t border-[#1e293b] flex gap-6 font-mono text-sm">
-          <Link href="/" className="text-[#94a3b8] hover:text-[#00ff88] transition-colors">
+          <a href="https://scottivan.com" className="text-[#94a3b8] hover:text-[#00ff88] transition-colors">
             ← ~/home
-          </Link>
+          </a>
           <Link href="/resume" className="text-[#94a3b8] hover:text-[#00ff88] transition-colors">
             ./resume
           </Link>

@@ -383,30 +383,95 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Final CTA ── */}
+      {/* ── Contact Form ── */}
       <section id="contact" className="bg-dark-surface text-white py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="max-w-3xl mx-auto text-center">
-            <p className="text-accent font-sans text-sm font-semibold tracking-section uppercase mb-6">
-              Let&apos;s talk
-            </p>
-            <h2 className="font-serif text-4xl md:text-6xl tracking-tightest leading-[1.1] mb-6">
-              Ready for a website that actually works?
-            </h2>
-            <p className="text-dark-body text-lg leading-relaxed mb-10 max-w-xl mx-auto">
-              Book a free 30-minute strategy call. I&apos;ll audit your current site,
-              show you where you&apos;re losing customers, and outline exactly how to fix it.
-              No obligation.
-            </p>
-            <a
-              href="mailto:hello@scottivan.com"
-              className="inline-block font-semibold px-10 py-4 bg-accent text-white text-sm hover:bg-accent-hover transition-colors"
+          <div className="max-w-2xl mx-auto">
+            <div className="text-center mb-12">
+              <p className="text-accent font-sans text-sm font-semibold tracking-section uppercase mb-6">
+                Let&apos;s talk
+              </p>
+              <h2 className="font-serif text-4xl md:text-6xl tracking-tightest leading-[1.1] mb-6">
+                Ready for a website that actually works?
+              </h2>
+              <p className="text-dark-body text-lg leading-relaxed max-w-xl mx-auto">
+                Tell me about your business and I&apos;ll get back to you within 24 hours
+                with a free strategy outline. No obligation.
+              </p>
+            </div>
+
+            <form
+              action="https://formspree.io/f/xykblgpy"
+              method="POST"
+              className="space-y-5"
             >
-              Book Your Free Strategy Call
-            </a>
-            <p className="text-dark-body text-xs mt-6">
-              Or email directly: hello@scottivan.com
-            </p>
+              <div className="grid md:grid-cols-2 gap-5">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Name *"
+                  required
+                  className="w-full bg-transparent border border-white/20 px-5 py-3.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent transition-colors"
+                />
+                <input
+                  type="text"
+                  name="business"
+                  placeholder="Business name"
+                  className="w-full bg-transparent border border-white/20 px-5 py-3.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent transition-colors"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-5">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email *"
+                  required
+                  className="w-full bg-transparent border border-white/20 px-5 py-3.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent transition-colors"
+                />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone (optional)"
+                  className="w-full bg-transparent border border-white/20 px-5 py-3.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent transition-colors"
+                />
+              </div>
+
+              <select
+                name="service"
+                required
+                defaultValue=""
+                className="w-full bg-transparent border border-white/20 px-5 py-3.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent transition-colors appearance-none"
+              >
+                <option value="" disabled className="bg-dark-surface">What are you looking for? *</option>
+                <option value="New Website" className="bg-dark-surface">New Website</option>
+                <option value="Website Redesign" className="bg-dark-surface">Website Redesign</option>
+                <option value="Custom Web Application" className="bg-dark-surface">Custom Web Application</option>
+                <option value="Other" className="bg-dark-surface">Other</option>
+              </select>
+
+              <textarea
+                name="message"
+                placeholder="Tell me a bit about your business and what you need..."
+                rows={4}
+                className="w-full bg-transparent border border-white/20 px-5 py-3.5 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-accent transition-colors resize-none"
+              />
+
+              {/* Honeypot */}
+              <input type="text" name="_gotcha" className="hidden" tabIndex={-1} autoComplete="off" />
+
+              <div className="text-center pt-2">
+                <button
+                  type="submit"
+                  className="inline-block font-semibold px-10 py-4 bg-accent text-white text-sm hover:bg-accent-hover transition-colors"
+                >
+                  Send Message
+                </button>
+                <p className="text-dark-body text-xs mt-6">
+                  Typically respond within 24 hours.
+                </p>
+              </div>
+            </form>
           </div>
         </div>
       </section>

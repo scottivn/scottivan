@@ -55,6 +55,12 @@ export default function Navbar() {
             </Link>
           ))}
           <a
+            href="https://scottivan.com"
+            className="font-mono text-sm text-[#94a3b8] hover:text-[#00d4ff] transition-colors"
+          >
+            home ↗
+          </a>
+          <a
             href="https://github.com"
             target="_blank"
             rel="noopener noreferrer"

@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import ContactModal from "../components/ContactModal";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -14,6 +15,7 @@ const fadeUp = {
 };
 
 export default function Portal() {
+  const [contactOpen, setContactOpen] = useState(false);
   const orbRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,12 +56,12 @@ export default function Portal() {
           >
             models
           </Link>
-          <a
-            href="mailto:hello@scottivan.com"
+          <button
+            onClick={() => setContactOpen(true)}
             className="font-sans text-sm px-4 py-2 rounded-full border border-portal-muted text-portal-dim hover:border-portal-accent hover:text-portal-accent transition-all"
           >
             contact
-          </a>
+          </button>
         </div>
       </nav>
 
@@ -168,6 +170,8 @@ export default function Portal() {
           &copy; {new Date().getFullYear()} Scott Ivan &middot; Built with Next.js &middot; Deployed on AWS
         </p>
       </footer>
+
+      <ContactModal open={contactOpen} onClose={() => setContactOpen(false)} />
     </div>
   );
 }
