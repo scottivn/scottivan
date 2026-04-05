@@ -4,7 +4,7 @@ const experience = [
   {
     role: "Platform Engineer — DevSecOps",
     company: "USAA",
-    period: "2024 – Present",
+    period: "2025 – Present",
     team: "EKS / DevSecRegOps Team",
     color: "#00ff88",
     highlights: [
@@ -18,7 +18,7 @@ const experience = [
   {
     role: "Platform Engineer — Containers as a Service",
     company: "USAA",
-    period: "2021 – 2024",
+    period: "2019 – 2025",
     team: "OpenShift / On-Prem Cloud Team",
     color: "#00d4ff",
     highlights: [
@@ -32,7 +32,7 @@ const experience = [
   {
     role: "Teaching Assistant — Computer Science",
     company: "University",
-    period: "2019 – 2021",
+    period: "2017 – 2019",
     team: "Data Structures & Algorithms",
     color: "#ffd700",
     highlights: [
@@ -65,9 +65,9 @@ const projects = [
     demoUrl: null,
     color: "#00d4ff",
     featured: false,
-    desc: "This site — personal portfolio and playground. Terminal-themed, built with Next.js, deployed on Vercel.",
+    desc: "This site — personal portfolio, model catalog, and playground. Terminal-themed, built with Next.js, deployed on AWS (S3 + CloudFront).",
     highlights: [],
-    stack: ["Next.js", "TypeScript", "Tailwind", "Vercel"],
+    stack: ["Next.js", "TypeScript", "Tailwind", "AWS", "CloudFront"],
   },
 ];
 
@@ -116,7 +116,7 @@ export default function ResumePage() {
                   {[
                     { label: "hello@scottivan.com", href: "mailto:hello@scottivan.com" },
                     { label: "github.com/scottivan", href: "https://github.com" },
-                    { label: "linkedin.com/in/scottivan", href: "https://linkedin.com" },
+                    { label: "linkedin.com/in/scottivan", href: "https://www.linkedin.com/in/scott-ivan-4a2905134" },
                     { label: "lichess.org/@/scottivn", href: "https://lichess.org/@/scottivn" },
                   ].map(({ label, href }) => (
                     <a

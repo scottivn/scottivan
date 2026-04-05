@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Scott Ivan | Platform Engineer",
     description: "Platform & DevSecOps engineer specializing in Kubernetes, EKS, and cloud-native architecture.",
-    url: "https://scottivan.com",
+    url: "https://me.scottivan.com",
     siteName: "scottivan.com",
     locale: "en_US",
     type: "website",

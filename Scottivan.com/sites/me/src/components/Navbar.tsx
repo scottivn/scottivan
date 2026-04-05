@@ -63,7 +63,7 @@ export default function Navbar() {
             github ↗
           </a>
           <a
-            href="https://linkedin.com"
+            href="https://www.linkedin.com/in/scott-ivan-4a2905134"
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-sm text-[#94a3b8] hover:text-[#00d4ff] transition-colors"

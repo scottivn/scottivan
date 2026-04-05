@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "modern-brochure",
+    "name": "Modern Brochure",
+    "tagline": "Clean, fast single-page site for service businesses",
+    "description": "A sleek brochure-style website with hero section, services grid, testimonials, and contact form. Perfect for consultants, agencies, and local businesses that need a professional online presence.",
+    "bestFor": ["Consultants", "Small Businesses", "Agencies"],
+    "status": "live",
+    "screenshot": "/screenshots/modern-brochure.png"
+  },
+  {
+    "slug": "saas-dashboard",
+    "name": "SaaS Dashboard",
+    "tagline": "Analytics dashboard with dark mode and data visualization",
+    "description": "A modern SaaS-style dashboard with sidebar navigation, data cards, charts, and a clean dark theme. Ideal for startups and tools that need a professional app feel.",
+    "bestFor": ["SaaS Startups", "Internal Tools", "Analytics"],
+    "status": "coming-soon",
+    "screenshot": "/screenshots/saas-dashboard.png"
+  },
+  {
+    "slug": "professional-service",
+    "name": "Professional Service",
+    "tagline": "Multi-page site for law firms, medical practices, and agencies",
+    "description": "A polished multi-page template with about, services, team, and contact pages. Built for businesses that need depth and credibility.",
+    "bestFor": ["Law Firms", "Medical Practices", "Professional Services"],
+    "status": "coming-soon",
+    "screenshot": "/screenshots/professional-service.png"
+  }
+]

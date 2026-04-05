@@ -1,22 +1,32 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Build and publish a single model site to its S3 bucket + CloudFront.
+# Usage: MODEL_NAME=modern-brochure bash scripts/publish-model.sh
+
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
-SITE_DIR="$REPO_ROOT/sites/portal"
+
+MODEL_NAME="${MODEL_NAME:?MODEL_NAME is required (e.g. modern-brochure)}"
+SITE_DIR="$REPO_ROOT/sites/${MODEL_NAME}"
 
 export AWS_PAGER=""
 
-STACK_NAME="${STACK_NAME:-scottivan-static-site}"
+STACK_NAME="scottivan-model-${MODEL_NAME}"
 AWS_REGION="${AWS_REGION:-us-east-1}"
+
+if [[ ! -d "$SITE_DIR" ]]; then
+  echo "Error: site directory not found at $SITE_DIR"
+  exit 1
+fi
 
 if [[ ! -d "$REPO_ROOT/node_modules" ]]; then
   echo "Installing npm dependencies..."
   (cd "$REPO_ROOT" && npm install)
 fi
 
-echo "Building portal site..."
-(cd "$REPO_ROOT" && npm run build:portal)
+echo "Building model: ${MODEL_NAME}..."
+(cd "$REPO_ROOT" && npm run build --workspace="@scottivan/${MODEL_NAME}")
 
 SITE_BUCKET_NAME="$(aws cloudformation describe-stacks \
   --region "$AWS_REGION" \
@@ -39,4 +49,4 @@ aws cloudfront create-invalidation \
   --paths '/*' \
   --output text >/dev/null
 
-echo "Publish complete."
+echo "Model '${MODEL_NAME}' published."

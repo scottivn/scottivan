@@ -5,5 +5,6 @@ const nextConfig = {
 	images: {
 		unoptimized: true,
 	},
+	transpilePackages: ["@scottivan/shared"],
 };
 module.exports = nextConfig;

@@ -309,7 +309,7 @@ export default function Home() {
           <span className="text-[#00ff88]">scott@scottivan.com</span>:~$ exit
         </p>
         <p className="font-mono text-[#4b5563] text-xs mt-1">
-          built with next.js · deployed on vercel · © {new Date().getFullYear()}
+          built with next.js · deployed on aws · © {new Date().getFullYear()}
         </p>
       </footer>
     </div>
