@@ -57,8 +57,69 @@ export default function ModelsPage() {
         </motion.div>
       </section>
 
+      {/* Featured Project */}
+      <section className="px-6 pb-12 max-w-5xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="card-glow rounded-2xl border border-portal-blue/30 bg-gradient-to-br from-portal-surface/80 to-portal-blue/5 overflow-hidden"
+        >
+          <div className="p-8 md:p-10">
+            <div className="flex items-center gap-3 mb-4">
+              <span
+                className="font-mono text-xs px-2.5 py-0.5 rounded-full"
+                style={{ background: "rgba(0,212,255,0.1)", color: "#00d4ff", border: "1px solid rgba(0,212,255,0.25)" }}
+              >
+                Live Project
+              </span>
+              <span className="font-mono text-xs text-portal-muted">patientsynapse.com</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-portal-text mb-3 tracking-tight">
+              PatientSynapse
+            </h2>
+            <p className="text-portal-dim text-sm leading-relaxed mb-5 max-w-2xl">
+              AI-powered medical practice management platform built for a sleep medicine clinic.
+              Integrates EMR data, automates DME ordering, and uses LLMs to route clinical tasks —
+              full-stack with FastAPI, React, PostgreSQL, and AWS.
+            </p>
+            <div className="flex flex-wrap gap-2 mb-6">
+              {["Healthcare", "AI / LLM", "Full-Stack", "AWS", "FHIR R4"].map((tag) => (
+                <span
+                  key={tag}
+                  className="font-mono text-xs px-2.5 py-1 rounded-full bg-portal-blue/10 text-portal-blue border border-portal-blue/20"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-3">
+              <a
+                href="https://patientsynapse.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-sans text-sm px-5 py-2.5 bg-portal-blue text-portal-bg rounded-lg font-semibold text-center hover:bg-portal-blue/90 transition-all hover:shadow-[0_0_20px_rgba(0,212,255,0.2)]"
+              >
+                View Live Site
+              </a>
+              <a
+                href="https://patientsynapse.com/login"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-sans text-sm px-5 py-2.5 border border-portal-blue/30 text-portal-blue rounded-lg font-semibold text-center hover:bg-portal-blue/10 transition-all"
+              >
+                Try Demo Login
+              </a>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Models grid */}
       <section className="px-6 pb-24 max-w-5xl mx-auto">
+        <p className="font-mono text-xs tracking-[0.2em] uppercase text-portal-accent mb-6">
+          Starter Models
+        </p>
         <div className="grid md:grid-cols-2 gap-6">
           {models.map((model, i) => {
             const isLive = model.status === "live";

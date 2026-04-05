@@ -82,11 +82,8 @@ Resources:
     Type: AWS::CloudFront::OriginAccessControl
     Properties:
       OriginAccessControlConfig:
-        Name: !Join
-          - '-'
-          - - !Ref AWS::StackName
-            - !Select [2, !Split ['/', !Ref AWS::StackId]]
-            - oac
+        Description: !Sub "OAC for ${AWS::StackName}"
+        Name: !Sub "${AWS::StackName}-oac"
         OriginAccessControlOriginType: s3
         SigningBehavior: always
         SigningProtocol: sigv4

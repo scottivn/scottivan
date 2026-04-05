@@ -10,6 +10,7 @@ MODEL_NAME="${MODEL_NAME:?MODEL_NAME is required (e.g. modern-brochure)}"
 
 export STACK_NAME="scottivan-model-${MODEL_NAME}"
 export SITE_DOMAIN_NAME="${MODEL_NAME}.scottivan.com"
+export SITE_BUCKET_NAME="scottivan-model-${MODEL_NAME}-$(aws sts get-caller-identity --query Account --output text)"
 export ENABLE_CUSTOM_DOMAIN="true"
 export CREATE_ROUTE53_RECORDS="false"
 export ENABLE_WAF="false"
