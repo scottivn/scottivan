@@ -89,6 +89,8 @@
         "cloudfront:GetOriginAccessControl",
         "cloudfront:UpdateOriginAccessControl",
         "cloudfront:DeleteOriginAccessControl",
+        "cloudfront:ListOriginAccessControls",
+        "cloudfront:ListDistributions",
         "cloudfront:ListTagsForResource"
       ],
       "Resource": "*"
