@@ -1,13 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --terminal-bg: #0a0e1a;
-  --terminal-green: #00ff88;
-  --terminal-cyan: #00d4ff;
+  --bg: #09090B;
+  --surface: #141416;
+  --elevated: #1C1C20;
+  --border: #27272A;
+  --border-hover: #3F3F46;
+  --text: #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-muted: #52525B;
+  --accent: #E8A830;
+  --accent-dim: rgba(232, 168, 48, 0.12);
+  --terminal-green: #34D399;
+  --terminal-green-dim: rgba(52, 211, 153, 0.12);
+  --blue: #60A5FA;
+  --red: #F87171;
 }
 
 * {
@@ -19,67 +30,114 @@ html {
 }
 
 body {
-  background-color: #0a0e1a;
-  color: #e2e8f0;
-  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', system-ui, sans-serif;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* CRT scanline effect */
-body::before {
+/* Dot grid overlay */
+.dot-grid::before {
   content: '';
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+  background-size: 40px 40px;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 0;
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0a0e1a;
+  background: var(--bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #00ff88;
+  background: var(--accent);
   border-radius: 3px;
 }
 
-/* Terminal text glow */
+/* Terminal glow */
 .glow-green {
-  text-shadow: 0 0 10px rgba(0, 255, 136, 0.8), 0 0 20px rgba(0, 255, 136, 0.4);
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
 }
-.glow-cyan {
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.8), 0 0 20px rgba(0, 212, 255, 0.4);
+.glow-accent {
+  text-shadow: 0 0 15px rgba(232, 168, 48, 0.4);
+}
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.card:hover {
+  border-color: var(--border-hover);
 }
 
 /* Terminal box */
 .terminal-box {
-  border: 1px solid rgba(0, 255, 136, 0.2);
-  background: rgba(17, 24, 39, 0.8);
-  backdrop-filter: blur(10px);
+  background: #0C0C10;
+  border: 1px solid #222228;
+  border-radius: 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 .terminal-box:hover {
-  border-color: rgba(0, 255, 136, 0.5);
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
-  transition: all 0.3s ease;
+  border-color: rgba(52, 211, 153, 0.25);
+  box-shadow: 0 0 25px rgba(52, 211, 153, 0.04);
 }
 
-/* Animated gradient background */
+/* Hero background */
 .hero-bg {
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
-    #0a0e1a;
+    radial-gradient(ellipse at 15% 50%, rgba(232, 168, 48, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 30%, rgba(52, 211, 153, 0.03) 0%, transparent 50%),
+    var(--bg);
+}
+
+/* Stat block */
+.stat-block {
+  border-left: 2px solid var(--accent);
+  padding-left: 0.875rem;
+}
+
+/* Section label */
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+/* Tag */
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6875rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+.tag:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Featured project card */
+.featured-border {
+  border: 1px solid rgba(232, 168, 48, 0.15);
+  background: rgba(232, 168, 48, 0.02);
+  border-radius: 16px;
+  transition: all 0.3s;
+}
+.featured-border:hover {
+  border-color: rgba(232, 168, 48, 0.35);
+  box-shadow: 0 4px 40px rgba(232, 168, 48, 0.05);
 }

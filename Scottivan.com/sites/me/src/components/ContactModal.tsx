@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 const FORMSPREE_URL = "https://formspree.io/f/xykblgpy";
 
@@ -64,45 +65,44 @@ export default function ContactModal({
   if (!open) return null;
 
   const inputClass =
-    "w-full bg-[#0a0e1a] border border-[#1f2937] rounded px-4 py-3 text-sm text-white font-mono placeholder:text-[#4b5563] focus:outline-none focus:border-[#00ff88]/50 focus:ring-1 focus:ring-[#00ff88]/20 transition-colors";
+    "w-full bg-[#09090B] border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white font-mono placeholder:text-zinc-600 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-colors";
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-full max-w-lg rounded-lg border border-[#00ff88]/20 bg-[#0d1117] p-8 shadow-[0_0_40px_rgba(0,255,136,0.05)]">
+      <div className="relative w-full max-w-lg rounded-2xl border border-zinc-800 bg-[#141416] p-8 shadow-[0_0_60px_rgba(0,0,0,0.5)]">
         {/* Terminal title bar */}
-        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-[#1f2937]">
+        <div className="flex items-center gap-2 mb-6 pb-4 border-b border-zinc-800">
           <div className="flex gap-1.5">
-            <button onClick={onClose} className="w-3 h-3 rounded-full bg-[#ff5f57] hover:brightness-110" aria-label="Close" />
-            <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-            <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+            <button onClick={onClose} className="w-3 h-3 rounded-full bg-red-500/80 hover:brightness-110" aria-label="Close" />
+            <div className="w-3 h-3 rounded-full bg-amber-500/80" />
+            <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
           </div>
-          <span className="font-mono text-xs text-[#4b5563] ml-2">~/contact</span>
+          <span className="font-mono text-xs text-zinc-600 ml-2">contact</span>
         </div>
 
         {status === "sent" ? (
           <div className="text-center py-8">
-            <p className="font-mono text-sm text-[#00ff88] glow-green mb-2">$ message sent ✓</p>
-            <p className="font-mono text-sm text-[#94a3b8]">
+            <p className="font-mono text-sm text-emerald-400 glow-green mb-2">Message sent ✓</p>
+            <p className="font-mono text-sm text-zinc-400">
               I&apos;ll get back to you within 24 hours.
             </p>
             <button
               onClick={onClose}
-              className="mt-6 font-mono text-sm px-6 py-2.5 rounded border border-[#1f2937] text-[#94a3b8] hover:text-white hover:border-[#00ff88]/30 transition-all"
+              className="mt-6 font-mono text-sm px-6 py-2.5 rounded-lg border border-zinc-700 text-zinc-400 hover:text-white hover:border-amber-500/30 transition-all"
             >
               close
             </button>
           </div>
         ) : (
           <>
-            <p className="font-mono text-xs text-[#4b5563] mb-1">$ cat contact_form.md</p>
-            <h3 className="font-mono text-lg text-white font-bold mb-1">
-              <span className="text-[#00ff88] glow-green">get_in_touch</span>()
+            <h3 className="font-display text-xl text-white font-bold mb-1">
+              Get in Touch
             </h3>
-            <p className="font-mono text-sm text-[#94a3b8] mb-6">
+            <p className="text-sm text-zinc-400 mb-6">
               Tell me about your project.
             </p>
 
@@ -140,14 +140,15 @@ export default function ContactModal({
               <button
                 type="submit"
                 disabled={status === "sending"}
-                className="w-full font-mono text-sm px-5 py-3 bg-[#00ff88] text-[#0a0e1a] rounded font-bold hover:bg-[#00ff88]/90 transition-all hover:shadow-[0_0_20px_rgba(0,255,136,0.4)] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full text-sm px-5 py-3 bg-amber-500 text-zinc-950 rounded-lg font-semibold hover:bg-amber-400 transition-all hover:shadow-[0_0_25px_rgba(232,168,48,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {status === "sending" ? "sending..." : "send_message()"}
+                {status === "sending" ? "Sending..." : "Send Message"}
               </button>
             </form>
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

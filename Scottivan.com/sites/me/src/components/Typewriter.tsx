@@ -52,14 +52,14 @@ export default function Typewriter({ lines, speed = 45, className = "" }: Typewr
             <span>
               {line}
               {i === currentLine && !done && (
-                <span className="inline-block w-2 h-5 bg-[#00ff88] ml-0.5 animate-blink align-middle" />
+                <span className="inline-block w-2 h-5 bg-emerald-400 ml-0.5 animate-blink align-middle" />
               )}
             </span>
           )}
         </div>
       ))}
       {done && (
-        <span className="inline-block w-2 h-5 bg-[#00ff88] ml-0.5 animate-blink align-middle" />
+        <span className="inline-block w-2 h-5 bg-emerald-400 ml-0.5 animate-blink align-middle" />
       )}
     </div>
   );
