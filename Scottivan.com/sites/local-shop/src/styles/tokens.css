@@ -1,0 +1,358 @@
+/**
+ * Field & Larder — Design Tokens
+ *
+ * Philosophy: Modern Artisan (warm, photography-led, characterful)
+ * See sites/local-shop/BRIEF.md for the full design brief.
+ *
+ * Tokens drive both light (default) and dark mode via [data-theme] attribute on <html>.
+ * Tailwind's tailwind.config.ts consumes these via var(--token) so utility classes
+ * automatically respond to mode changes.
+ *
+ * Fonts (Fraunces, Inter, JetBrains Mono) are loaded via next/font/google in layout.tsx,
+ * not @imported here, for performance.
+ */
+
+:root {
+  /* ============================================================
+   * COLOR — Light mode (default)
+   * Warm buttercream surfaces, espresso ink, clay accent.
+   * ============================================================ */
+
+  /* Raw palette (rarely used directly — prefer semantic tokens below) */
+  --palette-buttercream: #f5ebd9;
+  --palette-buttercream-tint: #faf3e6;
+  --palette-cream: #ffffff;
+  --palette-espresso: #1a130c;
+  --palette-espresso-lifted: #241a11;
+  --palette-walnut: #52443a;
+  --palette-warm-gray: #c9b89b;
+  --palette-rule-warm: #e5d8c3;
+  --palette-rule-dark: #3b2d20;
+  --palette-clay: #c25e2a;
+  --palette-clay-bright: #d8743d;
+  --palette-clay-soft: #f5dcc9;
+  --palette-leaf: #5c7a4f;
+  --palette-mustard: #b5882a;
+  --palette-brick: #a84432;
+
+  /* Surfaces */
+  --color-bg-primary: var(--palette-buttercream);
+  --color-bg-secondary: var(--palette-cream);
+  --color-bg-tertiary: var(--palette-buttercream-tint);
+  --color-bg-inverse: var(--palette-espresso);
+  --color-bg-overlay: rgba(26, 19, 12, 0.55);
+
+  /* Text */
+  --color-text-primary: var(--palette-espresso);
+  --color-text-secondary: var(--palette-walnut);
+  --color-text-tertiary: rgba(82, 68, 58, 0.6);
+  --color-text-inverse: var(--palette-buttercream);
+  --color-text-link: var(--palette-clay);
+  --color-text-link-hover: #a44a1f;
+
+  /* Borders / rules */
+  --color-border-primary: var(--palette-rule-warm);
+  --color-border-secondary: rgba(229, 216, 195, 0.6);
+  --color-border-strong: var(--palette-walnut);
+  --color-border-focus: var(--palette-clay);
+
+  /* Accent */
+  --color-accent-primary: var(--palette-clay);
+  --color-accent-primary-hover: #a44a1f;
+  --color-accent-primary-active: #8e3f17;
+  --color-accent-soft: var(--palette-clay-soft);
+  --color-accent-on-accent: var(--palette-buttercream);
+
+  /* Status */
+  --color-status-success: var(--palette-leaf);
+  --color-status-success-soft: rgba(92, 122, 79, 0.12);
+  --color-status-warning: var(--palette-mustard);
+  --color-status-warning-soft: rgba(181, 136, 42, 0.14);
+  --color-status-error: var(--palette-brick);
+  --color-status-error-soft: rgba(168, 68, 50, 0.12);
+  --color-status-info: #4a6c8c;
+  --color-status-info-soft: rgba(74, 108, 140, 0.12);
+
+  /* ============================================================
+   * TYPOGRAPHY
+   * Fraunces (display) + Inter (body) + JetBrains Mono (mono-tag).
+   * Sizes use rem; line-heights are unitless.
+   * ============================================================ */
+
+  /* Font families consume next/font CSS variables (set in layout.tsx). Fallbacks ensure
+     readable type even before the variable resolves on first paint. */
+  --font-family-display: var(--font-fraunces, "Iowan Old Style", "Georgia", serif);
+  --font-family-body: var(--font-inter, system-ui, -apple-system, "Segoe UI", sans-serif);
+  --font-family-mono: var(--font-jetbrains-mono, "Fira Code", "Cascadia Code", monospace);
+
+  /* Type scale — see BRIEF.md for the design spec. */
+  --font-size-eyebrow: 0.75rem;     /* 12px — uppercase eyebrow labels */
+  --font-size-mono-tag: 0.8125rem;  /* 13px — JetBrains mono tags */
+  --font-size-small: 0.875rem;      /* 14px */
+  --font-size-base: 1rem;           /* 16px — body */
+  --font-size-md: 1.125rem;         /* 18px */
+  --font-size-h3: 1.25rem;          /* 20px */
+  --font-size-h2: 1.75rem;          /* 28px */
+  --font-size-h1: 2.5rem;           /* 40px — fluid scales up */
+  --font-size-display-2: 3rem;      /* 48px */
+  --font-size-display-1: 4rem;      /* 64px — fluid scales up */
+
+  /* Fluid clamp for responsive display sizes */
+  --font-size-display-1-fluid: clamp(2.75rem, 4vw + 1.5rem, 5.5rem);  /* 44 → 88 */
+  --font-size-display-2-fluid: clamp(2.25rem, 2.5vw + 1.5rem, 3.5rem); /* 36 → 56 */
+  --font-size-h1-fluid: clamp(2rem, 1.5vw + 1.5rem, 2.75rem);         /* 32 → 44 */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.05;     /* Display */
+  --line-height-snug: 1.15;      /* Headings */
+  --line-height-normal: 1.5;     /* Body */
+  --line-height-relaxed: 1.65;   /* Long-form */
+
+  --letter-spacing-tight: -0.02em;     /* Display */
+  --letter-spacing-snug: -0.01em;      /* Large body / h2 */
+  --letter-spacing-normal: 0;
+  --letter-spacing-eyebrow: 0.12em;    /* Uppercase eyebrows */
+
+  /* ============================================================
+   * SPACING — 4px base, brief-aligned scale
+   * ============================================================ */
+
+  --space-0: 0;
+  --space-1: 0.25rem;   /*  4px */
+  --space-2: 0.5rem;    /*  8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.5rem;    /* 24px */
+  --space-6: 2rem;      /* 32px */
+  --space-7: 3rem;      /* 48px */
+  --space-8: 4rem;      /* 64px */
+  --space-9: 6rem;      /* 96px */
+  --space-10: 8rem;     /* 128px */
+
+  /* Section rhythm */
+  --space-section-y-mobile: var(--space-7);
+  --space-section-y: var(--space-9);
+  --space-section-y-loose: var(--space-10);
+
+  /* ============================================================
+   * LAYOUT
+   * ============================================================ */
+
+  --max-width-content: 65ch;        /* Long-form prose */
+  --max-width-wide: 1280px;
+  --max-width-page: 1360px;
+  --container-gutter: clamp(1rem, 4vw, 3rem);
+
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  /* ============================================================
+   * SHADOWS — warm-tinted (ochre/brown undertone), not blue-gray
+   * ============================================================ */
+
+  --shadow-xs: 0 1px 2px rgba(26, 19, 12, 0.06);
+  --shadow-sm: 0 2px 6px rgba(26, 19, 12, 0.08);
+  --shadow-md: 0 8px 20px rgba(26, 19, 12, 0.10);
+  --shadow-lg: 0 18px 40px rgba(26, 19, 12, 0.14);
+  --shadow-xl: 0 32px 64px rgba(26, 19, 12, 0.18);
+  --shadow-focus: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-border-focus);
+
+  /* ============================================================
+   * MOTION
+   * ============================================================ */
+
+  --duration-instant: 50ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ============================================================
+   * BREAKPOINTS — exposed for reference; Tailwind handles MQs.
+   * ============================================================ */
+
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  /* ============================================================
+   * Z-INDEX
+   * ============================================================ */
+
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 50;
+  --z-overlay: 100;
+  --z-drawer: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+
+  color-scheme: light;
+}
+
+/* ============================================================
+ * DARK MODE — explicit user choice (data-theme="dark")
+ * Espresso surfaces, buttercream ink, brighter clay accent.
+ * ============================================================ */
+
+[data-theme="dark"] {
+  /* Surfaces */
+  --color-bg-primary: var(--palette-espresso);
+  --color-bg-secondary: var(--palette-espresso-lifted);
+  --color-bg-tertiary: #2e2218;
+  --color-bg-inverse: var(--palette-buttercream);
+  --color-bg-overlay: rgba(0, 0, 0, 0.65);
+
+  /* Text */
+  --color-text-primary: var(--palette-buttercream);
+  --color-text-secondary: var(--palette-warm-gray);
+  --color-text-tertiary: rgba(201, 184, 155, 0.55);
+  --color-text-inverse: var(--palette-espresso);
+  --color-text-link: var(--palette-clay-bright);
+  --color-text-link-hover: #e89060;
+
+  /* Borders */
+  --color-border-primary: var(--palette-rule-dark);
+  --color-border-secondary: rgba(59, 45, 32, 0.6);
+  --color-border-strong: var(--palette-warm-gray);
+  --color-border-focus: var(--palette-clay-bright);
+
+  /* Accent (slightly brighter so it survives the dark surface) */
+  --color-accent-primary: var(--palette-clay-bright);
+  --color-accent-primary-hover: #e89060;
+  --color-accent-primary-active: #c25e2a;
+  --color-accent-soft: rgba(216, 116, 61, 0.16);
+  --color-accent-on-accent: var(--palette-espresso);
+
+  /* Status (slightly lifted lightness for dark backgrounds) */
+  --color-status-success: #7d9c70;
+  --color-status-success-soft: rgba(125, 156, 112, 0.18);
+  --color-status-warning: #d4a64a;
+  --color-status-warning-soft: rgba(212, 166, 74, 0.18);
+  --color-status-error: #c66554;
+  --color-status-error-soft: rgba(198, 101, 84, 0.18);
+  --color-status-info: #6f95b8;
+  --color-status-info-soft: rgba(111, 149, 184, 0.18);
+
+  /* Shadows — deeper, more transparent (light surfaces don't carry shadows the same way) */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.30);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.40);
+  --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --shadow-xl: 0 32px 64px rgba(0, 0, 0, 0.65);
+  --shadow-focus: 0 0 0 2px var(--color-bg-primary), 0 0 0 4px var(--color-border-focus);
+
+  color-scheme: dark;
+}
+
+/* ============================================================
+ * SYSTEM-PREFERENCE DARK — only when user hasn't explicitly chosen
+ * ============================================================ */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) {
+    --color-bg-primary: var(--palette-espresso);
+    --color-bg-secondary: var(--palette-espresso-lifted);
+    --color-bg-tertiary: #2e2218;
+    --color-bg-inverse: var(--palette-buttercream);
+    --color-bg-overlay: rgba(0, 0, 0, 0.65);
+
+    --color-text-primary: var(--palette-buttercream);
+    --color-text-secondary: var(--palette-warm-gray);
+    --color-text-tertiary: rgba(201, 184, 155, 0.55);
+    --color-text-inverse: var(--palette-espresso);
+    --color-text-link: var(--palette-clay-bright);
+    --color-text-link-hover: #e89060;
+
+    --color-border-primary: var(--palette-rule-dark);
+    --color-border-secondary: rgba(59, 45, 32, 0.6);
+    --color-border-strong: var(--palette-warm-gray);
+    --color-border-focus: var(--palette-clay-bright);
+
+    --color-accent-primary: var(--palette-clay-bright);
+    --color-accent-primary-hover: #e89060;
+    --color-accent-primary-active: #c25e2a;
+    --color-accent-soft: rgba(216, 116, 61, 0.16);
+    --color-accent-on-accent: var(--palette-espresso);
+
+    --color-status-success: #7d9c70;
+    --color-status-success-soft: rgba(125, 156, 112, 0.18);
+    --color-status-warning: #d4a64a;
+    --color-status-warning-soft: rgba(212, 166, 74, 0.18);
+    --color-status-error: #c66554;
+    --color-status-error-soft: rgba(198, 101, 84, 0.18);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.30);
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.40);
+    --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.55);
+    --shadow-xl: 0 32px 64px rgba(0, 0, 0, 0.65);
+
+    color-scheme: dark;
+  }
+}
+
+/* ============================================================
+ * BASE — global resets that consume the tokens above.
+ * Component styles live in their own modules and reference tokens via Tailwind.
+ * ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+::selection {
+  background-color: var(--color-accent-soft);
+  color: var(--color-text-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Respect reduced motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
