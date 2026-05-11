@@ -49,6 +49,13 @@ Parameters:
     Type: String
     Default: scottivan-site
     Description: Tag value used for project cost attribution and budgets.
+  UrlRewriteFunctionArn:
+    Type: String
+    Default: 'arn:aws:cloudfront::680467050770:function/scottivan-static-url-rewrite'
+    Description: |
+      ARN of a CloudFront Function that rewrites clean URLs (e.g. /shop/) to
+      the underlying S3 keys (/shop/index.html). Required for Next.js static
+      exports with trailingSlash=true. Set to empty string to disable.
 
 Conditions:
   UseWaf: !Equals [!Ref EnableWaf, 'true']
@@ -56,6 +63,7 @@ Conditions:
   UseRoute53: !Equals [!Ref CreateRoute53Records, 'true']
   HasHostedZone: !Not [!Equals [!Ref Route53HostedZoneId, '']]
   CreateDnsRecords: !And [!Condition UseRoute53, !Condition HasHostedZone, !Condition UseCustomDomain]
+  UseUrlRewrite: !Not [!Equals [!Ref UrlRewriteFunctionArn, '']]
 
 Resources:
   SiteBucket:
@@ -190,6 +198,11 @@ Resources:
           ResponseHeadersPolicyId: 67f7725c-6f97-4210-82d7-5512b31e9d03
           TargetOriginId: site-bucket-origin
           ViewerProtocolPolicy: redirect-to-https
+          FunctionAssociations: !If
+            - UseUrlRewrite
+            - - EventType: viewer-request
+                FunctionARN: !Ref UrlRewriteFunctionArn
+            - !Ref AWS::NoValue
         CustomErrorResponses:
           - ErrorCode: 403
             ResponseCode: 200

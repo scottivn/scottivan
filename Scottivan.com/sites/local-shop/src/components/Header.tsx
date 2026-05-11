@@ -6,6 +6,8 @@ import { Search, ShoppingBag, Menu, X } from "lucide-react";
 import { Logotype } from "@/components/Logotype";
 import { IconButton } from "@/components/ui/IconButton";
 import { DarkModeToggle } from "@/components/DarkModeToggle";
+import { useCart, cartItemCount } from "@/lib/cart";
+import { useUI } from "@/lib/ui-store";
 import { cn } from "@/lib/cn";
 
 const NAV_LINKS = [
@@ -17,6 +19,14 @@ const NAV_LINKS = [
 export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const lines = useCart((s) => s.lines);
+  const openCart = useUI((s) => s.openCart);
+  const itemCount = cartItemCount(lines);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function onScroll() {
@@ -85,9 +95,14 @@ export function Header() {
             <Search className="h-5 w-5" aria-hidden />
           </IconButton>
           <DarkModeToggle />
-          <Link
-            href="/cart"
-            aria-label="Cart"
+          <button
+            type="button"
+            onClick={openCart}
+            aria-label={
+              mounted && itemCount > 0
+                ? `Cart, ${itemCount} ${itemCount === 1 ? "item" : "items"}`
+                : "Cart"
+            }
             className={cn(
               "relative inline-flex h-11 w-11 items-center justify-center rounded-full",
               "text-ink-2 hover:text-accent hover:bg-accent-soft transition-colors duration-fast",
@@ -95,8 +110,15 @@ export function Header() {
             )}
           >
             <ShoppingBag className="h-5 w-5" aria-hidden />
-            {/* Badge slot — wired to cart store in Phase 2 */}
-          </Link>
+            {mounted && itemCount > 0 ? (
+              <span
+                aria-hidden
+                className="absolute -top-0.5 -right-0.5 inline-flex h-5 min-w-[1.25rem] px-1 items-center justify-center rounded-full bg-accent text-on-accent text-[10px] font-mono font-semibold leading-none"
+              >
+                {itemCount > 99 ? "99+" : itemCount}
+              </span>
+            ) : null}
+          </button>
         </div>
       </div>
 

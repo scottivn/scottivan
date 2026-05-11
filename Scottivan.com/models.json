@@ -32,7 +32,7 @@
     "tagline": "Specialty-grocer storefront with cart, Stripe checkout, and owner admin",
     "description": "A complete e-commerce demo for neighborhood specialty-food shops. Catalog with search and filters, in-store pickup or shipping, real Stripe-hosted checkout, customer order lookup, and a magic-link admin panel for products and orders. Built for owners who want to run the whole shop online without paying a Shopify tax.",
     "bestFor": ["Bakeries", "Coffee Roasters", "Butchers", "Specialty Grocers"],
-    "status": "coming-soon",
+    "status": "live",
     "screenshot": "/screenshots/local-shop.png"
   }
 ]

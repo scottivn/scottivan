@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "sites/*"
+    "sites/*",
+    "lambdas/*"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=@scottivan/portal",

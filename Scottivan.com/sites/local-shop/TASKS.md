@@ -62,14 +62,40 @@ Each task below is a vertical slice (structure + styling + interaction together)
 
 ---
 
-## Stripe Checkout Flow (Phase 4)
+## Stripe Checkout Flow (Phase 4) — CODE COMPLETE, DEPLOY PENDING
 
-- [ ] **`POST /api/checkout` Lambda**: Accepts cart payload, validates each line against DynamoDB stock, creates Stripe Checkout session (test mode) with line items + shipping options + customer email collection, returns `{ url, sessionId }`. Writes a pending intent record. _New Lambda._
-- [ ] **Frontend checkout submit**: Cart drawer + cart page Checkout button POSTs to `/api/checkout` and `window.location.assign(url)`. Loading state on the button; failure shows inline error. _Modifies: CartDrawer, /cart page._
-- [ ] **`POST /api/stripe-webhook` Lambda**: Verifies signature with `STRIPE_WEBHOOK_SECRET`. On `checkout.session.completed`: write order to `local-shop-orders` (orderId derived from session, email, items, total, fulfillment, status `paid`). Idempotent (skip if already written). _New Lambda._
-- [ ] **Order confirmation page (`/order/confirmed`)**: Reads `?session_id=` from URL, calls `GET /api/orders/by-session/{id}` Lambda. Hero order number in mono, line items, total, pickup-vs-ship details, "save this order ID + your email to look up later" prompt. Print-friendly. _New page + Lambda._
+> Code shipped in commit alongside this update. Deploy is blocked on user-provided Stripe test-mode keys. See `RESUME.md` for the two-step deploy dance.
+
+- [x] **`POST /api/checkout` Lambda** — `lambdas/local-shop/src/handlers/checkout.ts`
+- [x] **`POST /api/stripe-webhook` Lambda** — `lambdas/local-shop/src/handlers/stripe-webhook.ts`
+- [x] **`GET /api/orders/by-session` Lambda** — `lambdas/local-shop/src/handlers/orders-by-session.ts`
+- [x] **CloudFormation template** — `infra/local-shop.yml` (DynamoDB orders + GSI, 3 Lambdas, HTTP API)
+- [x] **Deploy script** — `scripts/deploy-local-shop-backend.sh`
+- [x] **publish-model.sh extension** — auto-detects API URL from backend stack and bakes `NEXT_PUBLIC_API_URL`
+- [x] **`CheckoutButton` frontend component** — wired into `/cart`
+- [x] **Order confirmation page** — `/order/confirmed`
+- [ ] **DEPLOY** — run `scripts/deploy-local-shop-backend.sh` twice (before/after Stripe webhook is configured); republish site
 
 **Checkpoint D — real test-mode payments working end-to-end.** Use Stripe test card `4242 4242 4242 4242`. Confirm DynamoDB row. Confirm confirmation page renders details.
+
+---
+
+## By-Weight Pickup Requests (Phase 4.5 — NEW)
+
+Added after Phase 4 design review. Many specialty-food items can't be priced upfront because they're cut or weighed at the counter (whole brisket, smoked fish, bulk cheese, charcuterie). Pretending otherwise is wrong; doing it right is a differentiating demo feature.
+
+**Approach: "Pickup request" parallel flow** — no Stripe charge, customer pays in-store. Locked in by user at end of last session.
+
+- [ ] **Catalog: add `pricingType` field**: extend `Product` type with `pricingType: "fixed" | "by-weight"`, plus optional `estimatedUnitPrice` (cents/lb) and `estimatedUnitLabel`. Convert 4-6 seed products to demonstrate (suggested: hand-cut ribeye, house pâté, smoked whitefish, whole brisket; maybe a new "Counter" category). _Touches: `src/lib/types.ts`, `src/data/products.ts`, possibly `src/data/categories.ts`._
+- [ ] **Card + Detail UI**: `ProductCard` shows "Pricing at pickup · est. $X/lb"; `ProductDetail` adds a "How it works" callout explaining the at-counter step. `StockBadge` for by-weight items reads "Available · weighed at counter". _Touches: `ProductCard`, product detail page, `StockBadge`._
+- [ ] **Cart logic**: add `cartHasByWeight(lines)` helper; if true, force fulfillment to pickup and disable shipping. Cart line item shows the line as "est. ~$X · final price at pickup". _Touches: `src/lib/cart.ts`, `CartLineItem`, `CartDrawer`, `/cart` page._
+- [ ] **`PickupRequestButton` component**: replaces `CheckoutButton` when `cartHasByWeight === true`. Inline form for email, phone, preferred pickup window (today / tomorrow / this week). Submits to `POST /api/pickup-request`. Mixed carts default to pickup-request mode (whole order completed in person). _New component._
+- [ ] **Lambda `pickup-request` handler**: validates payload, writes row to `local-shop-pickup-requests` DynamoDB table, sends SES email to shop owner with cart summary, returns `requestId + ETA`. _New file: `lambdas/local-shop/src/handlers/pickup-request.ts`._
+- [ ] **CFN extension**: add `PickupRequestsTable` (DynamoDB) and `PickupRequestFunction` (Lambda) + `POST /api/pickup-request` route. Grant Lambda DynamoDB write + SES SendEmail. Verify SES identity for sender + (sandbox) recipient. _Touches: `infra/local-shop.yml`._
+- [ ] **`/pickup/confirmed?id=...` page**: mirrors `/order/confirmed` but with "We'll call you within the day to confirm pickup time and final price" copy. Includes request ID + summary. _New page._
+- [ ] **Order-lookup parity (carries into Phase 5)**: extend `/orders/lookup` to also accept pickup-request IDs (single entry, server figures out which table). _Add to Phase 5 work._
+
+**Checkpoint D.5 — Specialty-shop dual-flow working.** Add a whole brisket + olive oil to cart → submit pickup request (real email lands) → confirmation page shows request ID → admin (Phase 6) sees request in pickup tab. Separately: add only olive oil → Stripe checkout works as before.
 
 ---
 

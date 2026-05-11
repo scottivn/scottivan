@@ -1,0 +1,304 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  Backend infrastructure for the local-shop model: DynamoDB orders table,
+  three Lambdas (checkout / stripe-webhook / orders-by-session), and an
+  HTTP API Gateway. The static site is deployed separately by static-site.yaml.
+
+Parameters:
+  ModelName:
+    Type: String
+    Default: local-shop
+    Description: Slug used to namespace resources.
+
+  StaticSiteOrigin:
+    Type: String
+    Default: https://local-shop.scottivan.com
+    Description: |
+      Origin allowed to call the API (CORS Access-Control-Allow-Origin).
+      Include the direct CloudFront URL too if you want to test there.
+
+  ArtifactBucket:
+    Type: String
+    Description: S3 bucket holding the zipped Lambda artifacts.
+
+  CheckoutZipKey:
+    Type: String
+    Description: S3 key for the checkout Lambda zip.
+
+  StripeWebhookZipKey:
+    Type: String
+    Description: S3 key for the stripe-webhook Lambda zip.
+
+  OrdersBySessionZipKey:
+    Type: String
+    Description: S3 key for the orders-by-session Lambda zip.
+
+  StripeSecretKey:
+    Type: String
+    NoEcho: true
+    Description: Stripe secret key (sk_test_... for test mode).
+
+  StripeWebhookSecret:
+    Type: String
+    NoEcho: true
+    Default: ''
+    Description: |
+      Stripe webhook signing secret (whsec_...). Set this AFTER first deploy:
+      1) deploy stack to create the API URL
+      2) create webhook in Stripe dashboard pointing at the API URL
+      3) re-deploy with this parameter set to the whsec_... value.
+
+  ProjectTagValue:
+    Type: String
+    Default: scottivan-model-local-shop
+
+Resources:
+  # ============ DynamoDB ============
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub '${ModelName}-orders'
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: orderId
+          AttributeType: S
+        - AttributeName: stripeSessionId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: orderId
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: StripeSessionIndex
+          KeySchema:
+            - AttributeName: stripeSessionId
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+
+  # ============ IAM ============
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: orders-rw
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:Query
+                Resource:
+                  - !GetAtt OrdersTable.Arn
+                  - !Sub '${OrdersTable.Arn}/index/*'
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+
+  # ============ Lambdas ============
+  CheckoutFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ModelName}-checkout'
+      Runtime: nodejs20.x
+      Architectures: [arm64]
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      MemorySize: 512
+      Timeout: 15
+      Code:
+        S3Bucket: !Ref ArtifactBucket
+        S3Key: !Ref CheckoutZipKey
+      Environment:
+        Variables:
+          STRIPE_SECRET_KEY: !Ref StripeSecretKey
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+
+  StripeWebhookFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ModelName}-stripe-webhook'
+      Runtime: nodejs20.x
+      Architectures: [arm64]
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      MemorySize: 512
+      Timeout: 30
+      Code:
+        S3Bucket: !Ref ArtifactBucket
+        S3Key: !Ref StripeWebhookZipKey
+      Environment:
+        Variables:
+          STRIPE_SECRET_KEY: !Ref StripeSecretKey
+          STRIPE_WEBHOOK_SECRET: !Ref StripeWebhookSecret
+          ORDERS_TABLE_NAME: !Ref OrdersTable
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+
+  OrdersBySessionFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${ModelName}-orders-by-session'
+      Runtime: nodejs20.x
+      Architectures: [arm64]
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      MemorySize: 256
+      Timeout: 10
+      Code:
+        S3Bucket: !Ref ArtifactBucket
+        S3Key: !Ref OrdersBySessionZipKey
+      Environment:
+        Variables:
+          ORDERS_TABLE_NAME: !Ref OrdersTable
+      Tags:
+        - Key: Project
+          Value: !Ref ProjectTagValue
+
+  # ============ CloudWatch Log Groups (explicit, 14d retention) ============
+  CheckoutLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ModelName}-checkout'
+      RetentionInDays: 14
+
+  StripeWebhookLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ModelName}-stripe-webhook'
+      RetentionInDays: 14
+
+  OrdersBySessionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ModelName}-orders-by-session'
+      RetentionInDays: 14
+
+  # ============ HTTP API Gateway ============
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub '${ModelName}-api'
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref StaticSiteOrigin
+        AllowMethods: [GET, POST, OPTIONS]
+        AllowHeaders: [Content-Type, Stripe-Signature]
+        MaxAge: 86400
+      Tags:
+        Project: !Ref ProjectTagValue
+
+  CheckoutIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt CheckoutFunction.Arn
+      IntegrationMethod: POST
+      PayloadFormatVersion: '2.0'
+
+  StripeWebhookIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt StripeWebhookFunction.Arn
+      IntegrationMethod: POST
+      PayloadFormatVersion: '2.0'
+
+  OrdersBySessionIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt OrdersBySessionFunction.Arn
+      IntegrationMethod: POST
+      PayloadFormatVersion: '2.0'
+
+  CheckoutRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: POST /api/checkout
+      Target: !Sub 'integrations/${CheckoutIntegration}'
+
+  StripeWebhookRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: POST /api/stripe-webhook
+      Target: !Sub 'integrations/${StripeWebhookIntegration}'
+
+  OrdersBySessionRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: GET /api/orders/by-session
+      Target: !Sub 'integrations/${OrdersBySessionIntegration}'
+
+  DefaultStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: '$default'
+      AutoDeploy: true
+
+  # ============ Lambda → API Gateway invoke permissions ============
+  CheckoutInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref CheckoutFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*'
+
+  StripeWebhookInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref StripeWebhookFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*'
+
+  OrdersBySessionInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref OrdersBySessionFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*'
+
+Outputs:
+  ApiUrl:
+    Description: Base URL of the HTTP API. Use this for NEXT_PUBLIC_API_URL on the site.
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com'
+
+  WebhookUrl:
+    Description: |
+      Configure this URL in the Stripe Dashboard webhook for event
+      `checkout.session.completed`. Copy the resulting signing secret
+      and redeploy with StripeWebhookSecret.
+    Value: !Sub 'https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/api/stripe-webhook'
+
+  OrdersTableName:
+    Description: DynamoDB table for orders.
+    Value: !Ref OrdersTable

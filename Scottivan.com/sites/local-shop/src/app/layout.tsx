@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeBoot } from "@/components/ThemeBoot";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { CartDrawer } from "@/components/CartDrawer";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -57,6 +58,7 @@ export default function RootLayout({
         <Header />
         <div className="flex-1 flex flex-col">{children}</div>
         <Footer />
+        <CartDrawer />
       </body>
     </html>
   );

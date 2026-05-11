@@ -25,6 +25,26 @@ if [[ ! -d "$REPO_ROOT/node_modules" ]]; then
   (cd "$REPO_ROOT" && npm install)
 fi
 
+BACKEND_STACK_NAME="scottivan-model-${MODEL_NAME}-backend"
+
+# If a backend stack exists, pull NEXT_PUBLIC_API_URL from its outputs so the
+# Next.js build embeds the right API origin in the bundle.
+EXISTING_API_URL=""
+if aws cloudformation describe-stacks \
+    --region "$AWS_REGION" \
+    --stack-name "$BACKEND_STACK_NAME" \
+    >/dev/null 2>&1; then
+  EXISTING_API_URL="$(aws cloudformation describe-stacks \
+    --region "$AWS_REGION" \
+    --stack-name "$BACKEND_STACK_NAME" \
+    --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
+    --output text 2>/dev/null || true)"
+  if [[ -n "$EXISTING_API_URL" && "$EXISTING_API_URL" != "None" ]]; then
+    echo "Using NEXT_PUBLIC_API_URL=$EXISTING_API_URL from backend stack."
+    export NEXT_PUBLIC_API_URL="$EXISTING_API_URL"
+  fi
+fi
+
 echo "Building model: ${MODEL_NAME}..."
 (cd "$REPO_ROOT" && npm run build --workspace="@scottivan/${MODEL_NAME}")
 
